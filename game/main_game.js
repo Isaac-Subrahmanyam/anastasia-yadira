@@ -5,8 +5,12 @@ var levelMap;
 // sound
 var bg1;
 var bg2;
+var bg3;
+var bg4;
 var scene1_rocks;
 var scene2_rocks;
+var scene3_rocks;
+var scene4_rocks;
 var doveS;
 var bgMusic;
 var walk;
@@ -18,8 +22,12 @@ var wind;
 function preload() {
     bg1 = loadImage("images/backdrop1.jpg");
     bg2 = loadImage("images/backdrop2.jpg");
+    bg3 = loadImage("images/backdrop3.jpg");
+    bg4 = loadImage("images/backdrop4.jpg");
     scene1_rocks = loadImage("images/scene_1_rocks.png");
     scene2_rocks = loadImage("images/scene_2_rocks.png");
+    scene3_rocks = loadImage("images/scene_3_rocks.png");
+    scene4_rocks = loadImage("images/scene_4_rocks.png");
     doveS = new Audio('sounds/whistle.mp3');
     bgMusic = new Audio('sounds/Mae.mp3');
     walk = new Audio("sounds/walk.mp3");
@@ -30,27 +38,31 @@ function preload() {
     doveS.reverb = 1;
     jumpS.volume = 0.25;
     portalS.volume = 0.05;
-    wind.volume = 0.5;
+    wind.volume = 1;
 }
 
 function setup()
 {
-    createCanvas(2000, 1000 /*, WEBGL */);
+    createCanvas(window.innerWidth, window.innerHeight);
     angleMode(DEGREES);
-
+    frameRate(60);
+    
     levelMap = [
         
     // 0
     {
         Canvas: 1900, // canvas width 
-        CanvasH: 1000, // canvas height
+        CanvasH: 950, // canvas height
+        spanX: 0, spanY: 0, spanSize: 150,
         
         player: new Player(250, 450, 30, 100), // player
-        
         portal: new Portal(1700, 600, 50, 50), // portal
         
         // bezier curves
         curves: [new Curv(200, 610, 705, 640, -100), new Curv(170 + 700, 590, 590 + 700, 550, -110), new Curv(170 + 800, 550, 570 + 800, 520, -75), new Curv(170 + 1350, 710, 570 + 1200, 700, -40), new Curv(170 + 1350 + 200, 710, 500 + 1200 + 200, 700, -30)],
+        
+        // camera boxes
+        camboxes: [],
         
         // doves
         hope: [new Hope (1100, 400)],
@@ -59,24 +71,102 @@ function setup()
         badplayer: [],
         
         // story text
-        storytxt: [
-        new StoryTxt("- this is the wonderful world of anastasia yadira -", 300, 200, 30, -15,
-        100, 200, 600, 400, false),
-        new StoryTxt("- anastasia needs to gather hope -", 1000, 200, 30, -5,
-        900, 400, 100, 200, false),
-        new StoryTxt("- anastasia needs some relief -", 1200, 300, 30, 5,
-        1150, 300, 100, 200, false),
-        new StoryTxt("- here, in this land, of desemira -", 1650, 450, 25, 15,
-        1400, 530, 300, 200, false)],
+        storytxt: [],
+        
+        // checkpoints
+        checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
 
     },
         
     // 1
     {
+        Canvas: 2000, // canvas width
+        CanvasH: 3000, // canvas height
+        spanX: 0, spanY: 300, spanSize: 100,
+        
+        player: new Player(450, 200, 30, 100), // player
+        
+        portal: new Portal(850+ 10 + 415 + 30 - 55, 800 + 1775 - 100, 50, 50), // portal
+        
+        // bezier curves
+        curves: [new Curv(245, 620, 680, 600, -105),
+                 new Curv(900 - 5, 800 - 10, 1250, 900, -45),
+                 new Curv(1280, 1370 - 10, 1580, 1230, -50),
+                 new Curv(1055, 1600, 1220, 1600 - 10, -30),
+                 new Curv(1055 - 275, 1600 + 210, 1220 - 305, 1725, -28),
+                 new Curv(245 - 30, 620 + 1500 - 25, 690 - 5, 600 + 1500 - 30, -90),
+                 new Curv(850+ 10, 800 + 1660 - 8, 1020, 900 + 1600, -30),
+                 new Curv(850+ 10 + 415 - 55, 800 + 1775, 1020 + 405 - 55, 900 + 1625, -26)],
+        
+        // camera boxes
+        camboxes: [],
+        
+        // doves
+        hope: [new Hope(1000 - 80, 2500 - 130), new Hope(1000 - 180, 2500 - 830), new Hope(1300 - 180, 2330 - 830), new Hope(1100, 740)],
+        
+        // evil black squids
+        badplayer: [],
+        
+        // story text
+        storytxt: [],
+        
+        // checkpoints
+        checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
+
+        },
+        
+    // 2
+    {
+        Canvas: 2000, // canvas width
+        CanvasH: 1500, // canvas height
+        spanX: 0, spanY: 0, spanSize: 130,
+        
+        player: new Player(450 - 200, 200 + 650, 30, 100), // player
+        
+        portal: new Portal(1600, 270, 50, 50), // portal
+        
+        // bezier curves
+        curves: [new Curv(245 - 120, 620 + 490, 610, 600 + 530, -90),
+                new Curv(555, 620 + 343, 650, 600 + 330, -23),
+                new Curv(690, 830 - 3, 610 + 500, 605, -90),
+                new Curv(690, 830 - 3, 610 + 350, 700, -100),
+                new Curv(555 + 615, 530, 650 + 630, 480, -23),
+                new Curv(555 + 830, 430, 650 + 1250, 480, -120),
+                new Curv(555 + 830, 430, 650 + 1050, 480, -115)],
+        
+        // camera boxes
+        camboxes: [],
+        
+        // doves
+        hope: [new Hope (1200, 420),new Hope (580, 860)],
+        
+        // evil black squids
+        badplayer: [new Badplayer(1000, 500, 700, 1070, "right", 2)],
+        
+        // story text
+        storytxt: [],
+        
+        // checkpoints
+        checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
+
+        },
+        
+    // 3
+    {
         Canvas: 3000, // canvas width
         CanvasH: 1000, // canvas height
+        spanX: 0, spanY: 0, spanSize: 130,
         
-        player: new Player(100, 580, 30, 100), // player
+        player: new Player(120, 580, 30, 100), // player
         
         portal: new Portal(2820, 520, 50, 50), // portal
         
@@ -96,24 +186,82 @@ function setup()
                  new Curv(1830 + 665 - 10, 360 + 10, 1960 + 665, 380, -20), 
                  new Curv(2070 + 665, 600, 1960 + 1000, 610, -30)],
         
+        // camera boxes
+        camboxes: [new CamBox(0, 0, 130, 
+                              1000, 0, 250, 1000, false),
+                   new CamBox(0, 0, 130, 
+                              100, 0, 250, 1000, false),
+                   new CamBox(300, 0, 150, 
+                              1400, 0, 250, 1000, false)],
+        
         // doves
         hope: [new Hope (200, 120), new Hope (1500, 240)],
         
         // evil black squids
         badplayer: [new Badplayer(550, 520, 410, 660, "left", 1),
-                   new Badplayer(550, 10, 410, 660, "right", 2)],
+                   new Badplayer(550, 10, 410, 660, "right", 2),
+                   new Badplayer(1150, 230, 1000, 1220, "right", 2)],
         
         // story text
         storytxt: [],
         
+        // checkpoints
+        checkpoints: [new Checkpoint(1430, 220)],
+        
+        // shadow floaters
+        floaters: [new Floater(2250 - 20, 50, 50, 450)],
 
         },
+        
+    // 4
+    {
+        Canvas: 1900, // canvas width 
+        CanvasH: 1000, // canvas height
+        spanX: 0, spanY: 0, spanSize: 100,
+        
+        player: new Player(250, 450, 30, 100), // player
+        
+        portal: new Portal(3000, 600, 50, 50), // portal
+        
+        // bezier curves
+        curves: [new Curv(200, 610, 705, 640, -100), new Curv(170 + 700, 590, 590 + 700, 550, -110), new Curv(170 + 800, 550, 570 + 800, 520, -75), new Curv(170 + 1350, 710, 570 + 1200, 700, -40), new Curv(170 + 1350 + 200, 710, 500 + 1200 + 200, 700, -30)],
+        
+        // camera boxes
+        camboxes: [],
+        
+        // doves
+        hope: [],
+        
+        // evil black squids
+        badplayer: [],
+        
+        // story text
+        storytxt: [
+        new StoryTxt("- demo for group 14 -", 300, 200, 30, -15,
+        100, 200, 600, 400, false)],
+        
+        // checkpoints
+        checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
+
+    },
     ];
 }
 
+function bezierCollisionPoint (i, obj1, obj2) {
+    return obj1.x + obj1.w >= (obj2.x1 + i) && 
+                obj1.y + obj1.h >= obj2.y1 + (obj2.c*sin(pi*(i/((obj2.x2-obj2.x1)/57.4)))) + (obj2.y2 - obj2.y1)*i/(obj2.x2 - obj2.x1) &&
+                obj1.x <= (obj2.x1 + i) &&
+                obj1.y + obj1.h / 1.5 <=  obj2.y1 + (obj2.c*sin(pi*(i/((obj2.x2-obj2.x1)/57.4)))) + (obj2.y2 - obj2.y1)*i/(obj2.x2 - obj2.x1);
+}
+
+// current level
+var level = 0;
 
 // for scouting map
-var scoutMap = [0, 0];
+var scoutMap = [0,0];
 
 // transition for scenes
 var trans = 0;
@@ -124,8 +272,9 @@ var portalAccess = false;
 // for curve detection
 var pi = Math.PI;
 
-// current level
-var level = 0;
+var spanLiveSize;
+var spanLiveX;
+var spanLiveY;
 
 // camera for game
 var cam;
@@ -138,22 +287,43 @@ function rectCollide (one, two) {
         one.y < two.y + two.h;
 };
 
+var spanGrow;
+
 // camera that is set to follow an element (player in this case)
 class Camera {
 
     constructor (x, y) {
-        this.x = x; this.y = y; this.w = innerWidth; this.h = innerHeight;
+        this.x = x; this.y = y; this.w = window.innerWidth; this.h = window.innerHeight;
+        this.scaleW = 0;
+        this.scaleH = 0;
     }
     
     view (plyer) {
-        this.x=plyer.x;
-        this.y=plyer.y;
-        this.w = innerWidth;
-        this.h = innerHeight;
-        this.x = constrain(this.x,this.w/2, levelMap[level].Canvas - this.w/2);
-        this.y = constrain(this.y,this.h/2, levelMap[level].CanvasH - this.h / 2);
-        translate((this.w / 2) - this.x,(this.h / 2) - this.y);
+        
+        spanGrow = levelMap[level].spanSize;
+        
+        this.x = lerp(this.x, plyer.x + levelMap[level].spanX, 0.05);
+        this.y = lerp(this.y, plyer.y + levelMap[level].spanY, 0.05);
+        
+        scale(spanGrow / 100);
+        
+        this.w = window.innerWidth;
+        this.h = window.innerHeight;
+        
+        this.scaleW = (this.w / (spanGrow / 100)) / 2;
+        this.scaleH = (this.h / (spanGrow / 100)) / 2;
+        
+        this.x = constrain(this.x, this.scaleW, levelMap[level].Canvas - this.scaleW);
+        this.y = constrain(this.y, this.scaleH, levelMap[level].CanvasH - this.scaleH);
+        
+        translate(this.scaleW - this.x, this.scaleH - this.y);
     };
+};
+
+var view = function(obj){
+    return obj.x + (window.innerWidth / 2) - cam.x < window.innerWidth && obj.x + (window.innerWidth / 2) - cam.x > -obj.w && obj.y + (window.innerHeight / 2) - cam.y < window.innerHeight && obj.y + (window.innerHeight / 2) - cam.y > -obj.h;
+    
+    //return 1;
 };
 
 // particles for snow effect
@@ -176,14 +346,7 @@ function reset () {
     levelMap[level].player.x = levelMap[level].player.origx;
     levelMap[level].player.y = levelMap[level].player.origy;
     levelMap[level].player.g = 0;
-    
-    for(var i in levelMap[level].hope)
-    {
-        levelMap[level].hope[i].collected = false;
-        levelMap[level].hope[i].anim = levelMap[level].hope[i].s;
-        levelMap[level].hope[i].fadeIn = 0;
-        levelMap[level].hope[i].fly = 2000;
-    }
+
 };
 
 // hope sprite
@@ -251,39 +414,42 @@ function hopeSprite (x, y, s) {
 class Hope {
     constructor (x, y) {
         this.x = x; this.y = y;
+        this.originy = y;
         this.w = 40; this.h = 40;
         this.s = 40;
         this.collected = false;
         this.anim = this.s;
         this.fadeIn = 0;
-        this.fly = 2000;
     }
     draw () {
         
-        // if collect start effect
-        if (this.collected === true)
+        if(view(this))
         {
-            noStroke();
-            fill(255, 255, 255, 50 - this.fadeIn);
-            ellipse(this.x + this.s / 2, this.y + this.fadeIn / 2, this.fadeIn * 1.5, this.fadeIn * 1.5);
-            ellipse(this.x + this.s / 2, this.y + this.fadeIn / 2, this.fadeIn, this.fadeIn);
-            ellipse(this.x, this.y, this.fadeIn, this.fadeIn);
-            ellipse(this.x + this.fadeIn, this.y, this.fadeIn, this.fadeIn);
-        }
-
-        hopeSprite(this.x - 108, this.y - 94 - 2000 + this.fly, 50);
-        
-        // play dove chirps
-        if(rectCollide(this, levelMap[level].player) && this.collected === false)
-        {
-            doveS.play();
-            this.collected = true;
+            // if collect start effect
+            if (this.collected === true)
+            {
+                noStroke();
+                fill(255, 255, 255, 50 - this.fadeIn);
+                ellipse(this.x + this.s / 2, this.originy + this.fadeIn / 2, this.fadeIn * 1.5, this.fadeIn * 1.5);
+                ellipse(this.x + this.s / 2, this.originy + this.fadeIn / 2, this.fadeIn, this.fadeIn);
+                ellipse(this.x, this.originy, this.fadeIn, this.fadeIn);
+                ellipse(this.x + this.fadeIn, this.originy, this.fadeIn, this.fadeIn);
+            }
+            
+            hopeSprite(this.x - 108, this.y - 94, 50);
+            
+            // play dove chirps
+            if(rectCollide(this, levelMap[level].player) && this.collected === false)
+            {
+                doveS.play();
+                this.collected = true;
+            }
         }
         
         // make bird fly if collected
         if (this.collected === true)
         {
-            this.fly /= 1.003;
+            this.y -= 3;
             this.fadeIn += 2;
         }
     }
@@ -300,66 +466,69 @@ class Portal {
     
     draw () {
         
-        // start particle effect if portal is activated 
-        if(portalAccess)
+        if(view(this))
         {
-            
-            // go to next level once collided
-            if(levelMap[level].player.x + levelMap[level].player.w >= this.x && 
-            levelMap[level].player.y + levelMap[level].player.h >= this.y &&
-            levelMap[level].player.x <= this.x + this.w &&
-            levelMap[level].player.y <=  this.y + this.h)
+            // start particle effect if portal is activated 
+            if(portalAccess)
             {
-                portalS.play();
-                reset();
-                level ++;
-            }
-            
-            // particle effect
-            fill(250, 242, 243, 150);
-            noStroke();
-            
-            for(var i = 0; i < this.particles.x.length; ++i)
-            {
-                push();
-                translate(this.particles.x[i], this.particles.y[i]);
-                rotate(this.particles.r[i]);
-                ellipse(0, this.particles.upAmount[i], this.particles.s[i], this.particles.s[i]);
-                pop();
 
-                this.particles.s[i] -= 2;
-                this.particles.upAmount[i] += this.particles.s[i] / 20;
-
-                if(this.particles.s[i] <= 0)
+                // go to next level once collided
+                if(levelMap[level].player.x + levelMap[level].player.w >= this.x && 
+                levelMap[level].player.y + levelMap[level].player.h >= this.y &&
+                levelMap[level].player.x <= this.x + this.w &&
+                levelMap[level].player.y <=  this.y + this.h)
                 {
-                    this.particles.x[i] = this.x + this.w / 2;
-                    this.particles.y[i] = this.y + this.h / 2;
-                    this.particles.s[i] = random(0, this.w);
-                    this.particles.r[i] = random(0, 360);
-                    this.particles.upAmount[i] = 0;
+                    portalS.play();
+                    reset();
+                    level ++;
                 }
 
+                // particle effect
+                fill(250, 242, 243, 150);
+                noStroke();
+
+                for(var i = 0; i < this.particles.x.length; ++i)
+                {
+                    push();
+                    translate(this.particles.x[i], this.particles.y[i]);
+                    rotate(this.particles.r[i]);
+                    ellipse(0, this.particles.upAmount[i], this.particles.s[i], this.particles.s[i]);
+                    pop();
+
+                    this.particles.s[i] -= 2;
+                    this.particles.upAmount[i] += this.particles.s[i] / 20;
+
+                    if(this.particles.s[i] <= 0)
+                    {
+                        this.particles.x[i] = this.x + this.w / 2;
+                        this.particles.y[i] = this.y + this.h / 2;
+                        this.particles.s[i] = random(0, this.w);
+                        this.particles.r[i] = random(0, 360);
+                        this.particles.upAmount[i] = 0;
+                    }
+
+                }
+
+                if(this.particles.x.length <= 30)
+                {
+                    this.particles.x.push(10000);
+                    this.particles.y.push(10000);
+                    this.particles.s.push(random(0, this.w));
+                    this.particles.r.push(random(0, 360));
+                }
             }
 
-            if(this.particles.x.length <= 50)
-            {
-                this.particles.x.push(10000);
-                this.particles.y.push(10000);
-                this.particles.s.push(random(0, this.w));
-                this.particles.r.push(random(0, 360));
-            }
+            // base portal
+            noFill();
+            stroke(255, 255, 255, 50);
+            strokeWeight(5);
+            ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
+            strokeWeight(8);
+            ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
+            stroke(255, 255, 255);
+            strokeWeight(2);
+            ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
         }
-        
-        // base portal
-        noFill();
-        stroke(255, 255, 255, 50);
-        strokeWeight(5);
-        ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
-        strokeWeight(8);
-        ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
-        stroke(255, 255, 255);
-        strokeWeight(2);
-        ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
     }
 };
 
@@ -430,30 +599,34 @@ class Badplayer {
     }
     
     draw () {
-        fill(255);
-        slenderSprite(this.switcher, this.x - 39, this.y - 38, 28);
+        
+        if(view(this))
+        {
+            fill(255);
+            slenderSprite(this.switcher, this.x - 39, this.y - 38, 28);
+        }
     }
     
     update () {
         
-        // go from left and right
-        if(this.x <= this.leftBound) { this.switcher = "right"; }
-        if(this.x >= this.rightBound) { this.switcher = "left"; }
-        if(this.switcher === "left") { this.x -= this.s; }
-        if(this.switcher === "right") { this.x += this.s; }
-        
-        // set gravity for slender
-        this.y += this.g;
-
-        this.g += 0.98;
-        
-        // if players touched enemy reset map
-        if(levelMap[level].player.x + levelMap[level].player.w >= this.x && 
-        levelMap[level].player.y + levelMap[level].player.h >= this.y &&
-        levelMap[level].player.x <= this.x + this.w &&
-        levelMap[level].player.y <=  this.y + this.h)
+        if(view(this))
         {
-            reset();
+            // go from left and right
+            if(this.x <= this.leftBound) { this.switcher = "right"; }
+            if(this.x >= this.rightBound) { this.switcher = "left"; }
+            if(this.switcher === "left") { this.x -= this.s; }
+            if(this.switcher === "right") { this.x += this.s; }
+
+            // set gravity for slender
+            this.y += this.g;
+
+            this.g += 0.98;
+
+            // if players touched enemy reset map
+            if(rectCollide(this, levelMap[level].player))
+            {
+                reset();
+            }
         }
     }
 }
@@ -464,41 +637,76 @@ class Curv {
     this.x1 = x1;  this.y1 = y1;
     this.x2 = x2;  this.y2 = y2;
     this.c = c;
+      
+    this.x = 0;
+    this.y = 0;
+    this.w = 0;
+    this.h = 0;
+      
+    if(this.y1 <= this.y2)
+    {
+      this.x = this.x1 - 10;
+      this.y = this.y1 - abs(this.c);
+      this.w = this.x2 - this.x1 + 20;
+      this.h = (this.y2 - this.y1) + abs(this.c);
+    } else
+    {
+      this.x = this.x1 - 10;
+      this.y = this.y2 - abs(this.c);
+      this.w = this.x2 - this.x1 + 20;
+      this.h = (this.y1 - this.y2) + abs(this.c);
+    }
   }
-  draw () {
-    
+  draw (p) {
+      
     stroke(255);  
     strokeWeight(2);
+
+//    noFill();
+//    rect(this.x, this.y, this.w, this.h);
+//    for(var i = 0; i < this.x2 - this.x1; i += 2)
+//    {
+//        point(this.x1 + i, this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1));
+//    }
     
-    // collisions for elements in game on bezier
-    for(var i = 0; i < this.x2 - this.x1; i += 1)
+    if(view(this))
     {
-        // point(this.x1 + i, this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1));
-        
         for(var j = 0; j < levelMap[level].badplayer.length; j++)
         {
-            if(levelMap[level].badplayer[j].x + levelMap[level].badplayer[j].w >= (this.x1 + i) && 
-            levelMap[level].badplayer[j].y + levelMap[level].badplayer[j].h >= this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) &&
-            levelMap[level].badplayer[j].x <= (this.x1 + i) + 2 &&
-            levelMap[level].badplayer[j].y + levelMap[level].badplayer[j].h / 1.5 <=  this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) + 6)
+            if(!rectCollide(levelMap[level].badplayer[j], this))
+            {
+                continue;
+            }
+            
+            var i = (levelMap[level].badplayer[j].x - this.x1);
+            
+            if(bezierCollisionPoint(i, levelMap[level].badplayer[j], this))
             {
                 levelMap[level].badplayer[j].y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - levelMap[level].badplayer[j].h;
-                
-                levelMap[level].badplayer[j].g = 0;
+
+                levelMap[level].badplayer[j].g = 1;
+            }
+
+        }
+        
+        // collide with player
+        if(rectCollide(p, this))
+        {
+            for(var i = (p.x - this.x1) + 5; i < (this.x2 - this.x1) + (p.x - this.x2 + 30); i += 5)
+            {   
+                // point(this.x1 + i, this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1));
+
+                if(bezierCollisionPoint(i, p, this) && (p.y + p.h) < (this.y + this.h + 20))
+                {
+                    p.y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - p.h;
+
+                    p.jump = false;
+                    p.g = 1;
+                }
             }
         }
-    
-        if(levelMap[level].player.x + levelMap[level].player.w >= (this.x1 + i) && 
-        levelMap[level].player.y + levelMap[level].player.h >= this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) &&
-        levelMap[level].player.x <= (this.x1 + i) + 2 &&
-        levelMap[level].player.y + levelMap[level].player.h / 1.5 <=  this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) + 6)
-        {
-            levelMap[level].player.y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - levelMap[level].player.h;
             
-            levelMap[level].player.jump = false;
-            levelMap[level].player.g = 1;
-        }        
-    }
+        }
   }
 }
 
@@ -553,6 +761,79 @@ class StoryTxt {
         }
     }
     
+}
+
+// checkpoint
+class Checkpoint {
+    constructor (x, y) {        
+        this.x = x; this.y = y;
+        this.w = 30; this.h = 100;
+        this.gotit = false;
+        this.shade = 300;
+    }
+    draw () {
+        
+        if(view(this))
+        {
+            noFill();
+            strokeWeight(6);
+            stroke(255, 255, 255, 100);
+            ellipse(this.x + this.w / 2, this.y + this.w / 2 - 2, this.w, this.w);
+            line(this.x + this.w / 2, this.y + this.w, this.x + this.w / 2, this.y + this.h);
+            strokeWeight(2);
+            stroke(255);
+            ellipse(this.x + this.w / 2, this.y + this.w / 2 - 2, this.w, this.w);
+            line(this.x + this.w / 2, this.y + this.w, this.x + this.w / 2, this.y + this.h);
+
+            noStroke();
+            if(this.gotit)
+            {
+                this.shade /= 1.01;
+                fill(255, 255, 255, 300 - this.shade)
+                ellipse(this.x + this.w / 2, this.y + this.w / 2 - 2, this.w, this.w);
+            }
+
+            if(rectCollide(this, levelMap[level].player))
+            {
+                this.gotit = true;
+                levelMap[level].player.origx = this.x + this.w / 2 + 30;
+                levelMap[level].player.origy = this.y + this.h / 2 - 100;
+            }
+        }
+    }
+}
+
+// camera spanner boxes
+class CamBox {
+    
+    constructor (spanX, spanY, spanSize, x, y, w, h, see)
+    {
+        this.x = x; this.y = y;
+        this.w = w; this.h = h;
+        this.spanX = spanX; this.spanY = spanY;
+        this.spanSize = spanSize;
+        this.see = see;
+        this.state = 0;
+        this.state1 = 0;
+        this.state2 = 0;
+    }
+    
+    draw ()
+    {
+        if(this.see)
+        {
+            noFill();
+            fill(255, 255, 255, 50);
+            rect(this.x, this.y, this.w, this.h);
+        }
+    
+        if(rectCollide(this, levelMap[level].player))
+        {
+            spanLiveX = this.spanY;
+            spanLiveSize = this.spanSize;
+            spanLiveX = this.spanX;
+        }
+    }
 }
 
 // sprite for anastasia
@@ -680,9 +961,6 @@ function anaSprite(x, y, s){
     {
         noFill();
         strokeWeight(15);
-        stroke(255, 255, 255, 20);
-        ana("move");
-        strokeWeight(10);
         stroke(255, 255, 255, 50);
         ana("move");
         strokeWeight(3);
@@ -698,9 +976,6 @@ function anaSprite(x, y, s){
         scale(-1.00, 1.00);
         noFill();
         strokeWeight(15);
-        stroke(255, 255, 255, 20);
-        ana("move");
-        strokeWeight(10);
         stroke(255, 255, 255, 50);
         ana("move");
         strokeWeight(3);
@@ -716,9 +991,6 @@ function anaSprite(x, y, s){
         scale(-1.00, 1.00);
         noFill();
         strokeWeight(15);
-        stroke(255, 255, 255, 20);
-        ana("stag");
-        strokeWeight(10);
         stroke(255, 255, 255, 50);
         ana("stag");
         strokeWeight(3);
@@ -750,14 +1022,14 @@ class Player {
         if((keys[39] || keys[68])) { this.x += this.s; }
 
         // jump with keys
-        if((keys[38] || keys[32] || keys[87]) && !this.jump) {
+        if((keys[38] || keys[32] || keys[87]) && !this.jump && this.g <= 5) {
             this.jump = true;
             this.g = -10;
             jumpS.play();
         }
         
-      // walk sound
-        if((keys[37] || keys[65] || keys[39] || keys[68]) && levelMap[level].player.jump === false)
+        // walk sound
+        if((keys[37] || keys[65] || keys[39] || keys[68]) && this.jump === false && this.g <= 5)
         {
             walk.play();
             walk.volume = 0.05;
@@ -766,7 +1038,8 @@ class Player {
             walk.volume = 0;
             walk.currentTime = 0;
         }
-      // gravity
+      
+        // gravity
         this.y += this.g;
         this.g += 0.55;
 
@@ -794,6 +1067,151 @@ class Player {
     }
 }
 
+// shadow floater
+class Floater
+{
+  constructor(x,y,s,r)
+  {
+    this.originX = x;
+    this.originY = y;
+    this.x = x  - s /4;
+    this.y = y  - s /2;
+    this.s = s;
+    this.w = this.s;
+    this.h = this.s;
+    this.f = 0;
+    this.r = r;
+    this.block();
+  }
+
+  image()
+  {
+    noFill();
+    quad(200, 100, 175, 150, 200, 200, 224, 150);
+    
+    triangle(217, 136, 225, 108, 209, 118);
+    triangle(232 -50, 136, 225 - 50, 108, 241 - 50, 118);
+    
+    var rotSpeed = 0.5;
+    var triDist = 60;
+    
+    noFill();
+    
+    for(var i = 0; i < 12; i ++)
+    {
+      triangle(195 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 155  - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)), 205 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 155 - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)), 200 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 146 - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)));   
+    }
+
+    arc(192, 150, 10, 10, 264, 458);
+    arc(192, 155, 10, 10, 429, 632);
+    
+    arc(207, 155, 10, 10, 264, 458);
+    arc(207, 150, 10, 10, 429, 632);
+  }
+
+  draw()
+  {
+    noFill();
+    
+    var size;
+    noStroke();
+    fill(0, 0, 0, 150);
+    for(var i = 0; i < this.r * 2; i++)
+    {
+      size = 2 + 3* sin((i / 90) * frameCount);
+      ellipse(this.originX + ((this.r - 30 + size/2)*sin(2 * i)), this.originY+ ((this.r - 30 + size /2)*cos(2 * i)), size, size);  
+    }
+    
+    if(view(this) - 100)
+    {
+        push();
+        translate(this.x, this.y);
+        translate(this.s * -1.74, this.s * -0.99);
+        scale(this.s / 100);
+        strokeWeight(7);
+        stroke(0, 0, 0, 60);
+        this.image();
+        strokeWeight(2);
+        stroke(0, 0, 0);
+        this.image();
+        pop();
+    }
+  }
+
+  movement()
+  {
+    var seekX;
+    var seekY;
+    var d;
+    
+    if(dist(levelMap[level].player.x + levelMap[level].player.w/2, levelMap[level].player.y + levelMap[level].player.h/2, this.originX , this.originY) <= this.r)
+    {
+      seekX = levelMap[level].player.x + levelMap[level].player.w/2;
+      seekY = levelMap[level].player.y + levelMap[level].player.h/2;
+    }
+    else
+    {
+      seekX = this.originX;
+      seekY = this.originY;
+    }
+    
+    var e = new createVector(this.x  + this.s /4, this.y  + this.s/2);
+    var p = new createVector(seekX, seekY);
+    
+    p.sub(e);
+    
+    d = dist(seekX, seekY, this.x, this.y);
+    
+    this.x += ( 2 *(p.x) / 200);
+    this.y += ( 2 *(p.y) / 200);
+  }
+
+  block()
+  {
+    this.meshX = [];
+    this.meshY = [];
+    this.meshW = [];
+    this.meshH = [];
+    
+    for(var i = 0; i < 12; i++)
+    {
+      this.meshX.push(this.x);
+      this.meshY.push(this.y);
+      this.meshW.push(this.s/6.5);
+      this.meshH.push(this.s/6.5);
+    }
+  }
+
+  mesh()
+  {
+    for(var i = 0; i < 12; i++)
+    {
+      this.meshX[i] = this.x + this.s / 4 - (this.s / 6.5)/2 - (this.s/1.52 + (this.s / 10) *sin(frameCount * 3)) *sin(0.5*frameCount + (i*30));    
+      this.meshY[i] = this.y + this.s/2  - (this.s / 6.5)/2 + (this.s/1.52 + (this.s / 10) * sin(frameCount * 3)) *cos(0.5*frameCount  + (i*30));
+    }
+  }
+
+  collision()
+  {
+    this.mesh();
+    
+    for(var i = 0; i < 12; i++)
+    {
+      if(levelMap[level].player.x + levelMap[level].player.w > this.meshX[i] && levelMap[level].player.x < this.meshX[i] + this.meshW[i] && levelMap[level].player.y + levelMap[level].player.h > this.meshY[i] && levelMap[level].player.y < this.meshY[i] + this.meshH[i])
+      {
+        reset();
+      }
+    }
+  }
+
+  apply()
+  {
+    this.collision();
+    this.draw();
+    this.movement();
+  }
+}
+
 // snow effect
 function snow (w){
     
@@ -811,7 +1229,7 @@ function snow (w){
         particles.y[i] += particles.s[i]; // particl goes up
         particles.x[i] -= 0.5;
         
-        if(particles.y[i] >= height) // is particle is totally shrunk
+        if(particles.y[i] >= levelMap[level].CanvasH) // is particle is totally shrunk
         {
             //reset particle
             particles.x[i] = random(0, w);
@@ -839,7 +1257,7 @@ function drawLevels () {
     push();
     translate(scoutMap[0], scoutMap[1]);
     cam.view(levelMap[level].player);
-    
+
     // level bg's
     switch (level) {
             case 0:
@@ -849,31 +1267,97 @@ function drawLevels () {
                 break;
             
         case 1:
+        image(bg3, 0, 0);
+        snow(levelMap[level].Canvas + 100);
+        image(scene3_rocks, 0, 0);
+                break;
+        
+        case 2:
+        image(bg4, 0, 0);
+        snow(levelMap[level].Canvas + 100);
+        image(scene4_rocks, 0, 0);
+                break;
+            
+        case 3:
         image(bg2, 0, 0);
         snow(levelMap[level].Canvas + 100);
         image(scene2_rocks, 0, 0);
                 break;
     }
     
-    for(var i in levelMap[level].curves)
+    for(var i = 0; i < levelMap[level].curves.length; i++)
     {
-      levelMap[level].curves[i].draw();
+      levelMap[level].curves[i].draw(levelMap[level].player);
     }
     
-    for(var i in levelMap[level].hope) {
+    for(var i = 0; i < levelMap[level].hope.length; i++) {
       levelMap[level].hope[i].draw();
         if(levelMap[level].hope[i].collected === false) { 
             portalAccess = false;
         }
     }
     
-    for(var i in levelMap[level].storytxt) {
+    for(var i = 0; i < levelMap[level].storytxt.length; i++) {
       levelMap[level].storytxt[i].draw();
     }
     
-    for(var i in levelMap[level].badplayer) {
+    for(var i = 0; i < levelMap[level].checkpoints.length; i++) {
+      levelMap[level].checkpoints[i].draw();
+    }
+    
+    for(var i = 0; i < levelMap[level].badplayer.length; i++) {
         levelMap[level].badplayer[i].draw();
         levelMap[level].badplayer[i].update();
+    }
+    
+    for(var i = 0; i < levelMap[level].floaters.length; i++)
+    {
+      levelMap[level].floaters[i].apply();
+    }
+    
+    for(var i = 0; i < levelMap[level].camboxes.length; i++)
+    {
+      levelMap[level].camboxes[i].draw();
+    }
+    
+    
+    if(levelMap[level].spanSize <= spanLiveSize)
+    {
+        levelMap[level].spanSize += 0.2;
+    }
+    if(levelMap[level].spanSize >= spanLiveSize)
+    {
+        levelMap[level].spanSize -= 0.2;
+    }
+    if(levelMap[level].spanSize === spanLiveSize)
+    {
+        levelMap[level].spanSize = spanLiveSize;
+    }
+
+    if(levelMap[level].spanX <= spanLiveX)
+    {
+        levelMap[level].spanX += 2;
+    }
+    if(levelMap[level].spanX >= spanLiveX)
+    {
+        levelMap[level].spanX -= 2;
+    }
+    if(levelMap[level].spanX === spanLiveX)
+    {
+        levelMap[level].spanX = spanLiveX;
+    }
+    
+    if(levelMap[level].spanY <= spanLiveY)
+    {
+        levelMap[level].spanY += 2;
+    }
+    if(levelMap[level].spanY >= spanLiveY)
+    {
+        levelMap[level].spanY -= 2;
+    }
+    if(levelMap[level].spanY === spanLiveY)
+    {
+        levelMap[level].spanY = spanLiveY;
     }
     
     levelMap[level].portal.draw();
@@ -884,7 +1368,11 @@ function drawLevels () {
 
 var startMusicDelay = 0;
 
+var h = window.innerHeight;
+
 function draw() {
+    
+    createCanvas(window.innerWidth, window.innerHeight);
     
     // if in levels
     startMusicDelay ++;
@@ -900,6 +1388,5 @@ function draw() {
     
     trans /= 1.1;
     fill(255, 255, 255, trans);
-    rect(0, 0, window.innerWidth, window.innerHeight);
-    
+    rect(0, 0, window.innerWidth, window.innerHeight);    
 }
