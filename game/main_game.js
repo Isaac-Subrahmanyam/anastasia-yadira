@@ -85,7 +85,7 @@ function setup()
     {
         Canvas: 2000, // canvas width
         CanvasH: 3000, // canvas height
-        spanX: 0, spanY: 300, spanSize: 100,
+        spanX: 0, spanY: 300, spanSize: 110,
         
         player: new Player(450, 200, 30, 100), // player
         
@@ -164,7 +164,7 @@ function setup()
     {
         Canvas: 3000, // canvas width
         CanvasH: 1000, // canvas height
-        spanX: 0, spanY: 0, spanSize: 130,
+        spanX: 0, spanY: 0, spanSize: 140,
         
         player: new Player(120, 580, 30, 100), // player
         
@@ -187,12 +187,12 @@ function setup()
                  new Curv(2070 + 665, 600, 1960 + 1000, 610, -30)],
         
         // camera boxes
-        camboxes: [new CamBox(0, 0, 130, 
-                              1000, 0, 250, 1000, false),
-                   new CamBox(0, 0, 130, 
-                              100, 0, 250, 1000, false),
+        camboxes: [new CamBox(0, 0, 140, 
+                              1000, 0, 250, 1000),
+                   new CamBox(0, 0, 140, 
+                              100, 0, 250, 1000),
                    new CamBox(300, 0, 150, 
-                              1400, 0, 250, 1000, false)],
+                              1400, 0, 250, 1000)],
         
         // doves
         hope: [new Hope (200, 120), new Hope (1500, 240)],
@@ -247,6 +247,7 @@ function setup()
         floaters: [],
 
     },
+
     ];
 }
 
@@ -261,7 +262,10 @@ function bezierCollisionPoint (i, obj1, obj2) {
 var level = 0;
 
 // for scouting map
-var scoutMap = [0,0];
+var scoutMap = [0, 0];
+
+// spectator mode
+var spectMode = false;
 
 // transition for scenes
 var trans = 0;
@@ -422,6 +426,14 @@ class Hope {
         this.fadeIn = 0;
     }
     draw () {
+        
+        if(spectMode)
+        {
+            stroke(255, 255, 255);
+            noFill();
+            rect(this.x, this.y, this.w, this.h);
+        }
+        
         
         if(view(this))
         {
@@ -600,6 +612,13 @@ class Badplayer {
     
     draw () {
         
+        if(spectMode)
+        {
+            stroke(255, 255, 255);
+            noFill();
+            rect(this.x, this.y, this.w, this.h);
+        }
+        
         if(view(this))
         {
             fill(255);
@@ -657,34 +676,38 @@ class Curv {
       this.h = (this.y1 - this.y2) + abs(this.c);
     }
   }
-  draw (p) {
+  
+    draw (p, e) {
       
     stroke(255);  
     strokeWeight(2);
 
-//    noFill();
-//    rect(this.x, this.y, this.w, this.h);
-//    for(var i = 0; i < this.x2 - this.x1; i += 2)
-//    {
-//        point(this.x1 + i, this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1));
-//    }
+    if(spectMode)
+    {
+        noFill();
+        rect(this.x, this.y, this.w, this.h);
+        for(var i = 0; i < this.x2 - this.x1; i += 2)
+        {
+            point(this.x1 + i, this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1));
+        }
+    }
     
     if(view(this))
     {
-        for(var j = 0; j < levelMap[level].badplayer.length; j++)
+        for(var j = 0; j < e.length; j++)
         {
-            if(!rectCollide(levelMap[level].badplayer[j], this))
+            if(!rectCollide(e[j], this))
             {
                 continue;
             }
             
-            var i = (levelMap[level].badplayer[j].x - this.x1);
+            var i = (e[j].x - this.x1);
             
-            if(bezierCollisionPoint(i, levelMap[level].badplayer[j], this))
+            if(bezierCollisionPoint(i, e[j], this))
             {
-                levelMap[level].badplayer[j].y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - levelMap[level].badplayer[j].h;
+                e[j].y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - e[j].h;
 
-                levelMap[level].badplayer[j].g = 1;
+                e[j].g = 1;
             }
 
         }
@@ -699,7 +722,6 @@ class Curv {
                 if(bezierCollisionPoint(i, p, this) && (p.y + p.h) < (this.y + this.h + 20))
                 {
                     p.y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - p.h;
-
                     p.jump = false;
                     p.g = 1;
                 }
@@ -773,6 +795,14 @@ class Checkpoint {
     }
     draw () {
         
+        if(spectMode)
+        {
+            stroke(255, 255, 255);
+            noFill();
+            rect(this.x, this.y, this.w, this.h);
+        }
+        
+        
         if(view(this))
         {
             noFill();
@@ -812,20 +842,17 @@ class CamBox {
         this.w = w; this.h = h;
         this.spanX = spanX; this.spanY = spanY;
         this.spanSize = spanSize;
-        this.see = see;
-        this.state = 0;
-        this.state1 = 0;
-        this.state2 = 0;
     }
     
     draw ()
     {
-        if(this.see)
+        if(spectMode)
         {
             noFill();
             fill(255, 255, 255, 50);
             rect(this.x, this.y, this.w, this.h);
         }
+        
     
         if(rectCollide(this, levelMap[level].player))
         {
@@ -1016,6 +1043,13 @@ class Player {
     cam = new Camera(this.x,this.y);
   }
   update () {
+      
+        if(spectMode)
+        {
+            stroke(255, 255, 255);
+            noFill();
+            rect(this.x, this.y, this.w, this.h);
+        }
         
         // move with keys
         if((keys[37] || keys[65])) { this.x -= this.s; }
@@ -1186,8 +1220,15 @@ class Floater
   {
     for(var i = 0; i < 12; i++)
     {
-      this.meshX[i] = this.x + this.s / 4 - (this.s / 6.5)/2 - (this.s/1.52 + (this.s / 10) *sin(frameCount * 3)) *sin(0.5*frameCount + (i*30));    
-      this.meshY[i] = this.y + this.s/2  - (this.s / 6.5)/2 + (this.s/1.52 + (this.s / 10) * sin(frameCount * 3)) *cos(0.5*frameCount  + (i*30));
+        this.meshX[i] = this.x + this.s / 4 - (this.s / 6.5)/2 - (this.s/1.52 + (this.s / 10) *sin(frameCount * 3)) *sin(0.5*frameCount + (i*30));    
+        this.meshY[i] = this.y + this.s/2  - (this.s / 6.5)/2 + (this.s/1.52 + (this.s / 10) * sin(frameCount * 3)) *cos(0.5*frameCount  + (i*30));
+        
+        if(spectMode)
+        {
+            stroke(255, 255, 255);
+            noFill();
+            rect(this.meshX[i], this.meshY[i], this.meshW[i], this.meshH[i]);
+        }
     }
   }
 
@@ -1287,7 +1328,7 @@ function drawLevels () {
     
     for(var i = 0; i < levelMap[level].curves.length; i++)
     {
-      levelMap[level].curves[i].draw(levelMap[level].player);
+      levelMap[level].curves[i].draw(levelMap[level].player, levelMap[level].badplayer);
     }
     
     for(var i = 0; i < levelMap[level].hope.length; i++) {
