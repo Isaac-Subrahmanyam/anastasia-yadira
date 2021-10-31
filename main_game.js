@@ -17,28 +17,39 @@ var walk;
 var jumpS;
 var portalS;
 var wind;
+var squid;
 
 // preload images and sounds
 function preload() {
+    
+    // load images backdrops
     bg1 = loadImage("images/backdrop1.jpg");
     bg2 = loadImage("images/backdrop2.jpg");
     bg3 = loadImage("images/backdrop3.jpg");
     bg4 = loadImage("images/backdrop4.jpg");
+    
+    // load rock scenes on second layer
     scene1_rocks = loadImage("images/scene_1_rocks.png");
     scene2_rocks = loadImage("images/scene_2_rocks.png");
     scene3_rocks = loadImage("images/scene_3_rocks.png");
     scene4_rocks = loadImage("images/scene_4_rocks.png");
+    
+    // load game sounds
     doveS = new Audio('sounds/whistle.mp3');
     bgMusic = new Audio('sounds/Mae.mp3');
     walk = new Audio("sounds/walk.mp3");
     jumpS = new Audio("sounds/jump.mp3");
     portalS = new Audio("sounds/portal.mp3");
     wind = new Audio("sounds/wind.mp3");
+    squid = new Audio("sounds/squid.mp3");
+    
+    // fine tune volume and reverb settings
     doveS.volume = 0.05;
     doveS.reverb = 1;
     jumpS.volume = 0.25;
     portalS.volume = 0.05;
     wind.volume = 1;
+    squid.volume = 0.2;
 }
 
 function setup()
@@ -72,7 +83,7 @@ function setup()
         
         // story text
         storytxt: [
-            new StoryTxt ("This is a demo of Anastasia Yadira\nfor employers to check out our JS skills.\nCreators:\n- Isaac Subrahmanyam\n- Kenaniah Subrahmanyam", 250, 300, 20, -15, 
+            new StoryTxt ("This is a demo of Anastasia Yadira\nfor employers to check out our JS skills.\n\nCreators:\n- Isaac Subrahmanyam\n- Kenaniah Subrahmanyam\n\nMusic:\nMae - Berlinist", 250, 300, 15, -15, 
                             200, 500, 100, 100, false),
             new StoryTxt ("Technologies used:\nNetlify, P5.js, Photoshop", 1000, 300, 20, -10, 
                             900, 450, 100, 100, false),
@@ -258,6 +269,7 @@ function setup()
     ];
 }
 
+// define bezier collision at a point
 function bezierCollisionPoint (i, obj1, obj2) {
     return obj1.x + obj1.w >= (obj2.x1 + i) && 
                 obj1.y + obj1.h >= obj2.y1 + (obj2.c*sin(pi*(i/((obj2.x2-obj2.x1)/57.4)))) + (obj2.y2 - obj2.y1)*i/(obj2.x2 - obj2.x1) &&
@@ -283,6 +295,7 @@ var portalAccess = false;
 // for curve detection
 var pi = Math.PI;
 
+// for live camera spanning
 var spanLiveSize;
 var spanLiveX;
 var spanLiveY;
@@ -311,30 +324,35 @@ class Camera {
     
     view (plyer) {
         
+        // set spangrow to be initialized with map
         spanGrow = levelMap[level].spanSize;
         
+        // interpolation for camera following player
         this.x = lerp(this.x, plyer.x + levelMap[level].spanX, 0.05);
         this.y = lerp(this.y, plyer.y + levelMap[level].spanY, 0.05);
         
+        // scale based on map span grow settings
         scale(spanGrow / 100);
         
         this.w = window.innerWidth;
         this.h = window.innerHeight;
         
+        // scale width and height based on span grow
         this.scaleW = (this.w / (spanGrow / 100)) / 2;
         this.scaleH = (this.h / (spanGrow / 100)) / 2;
         
+        // constrain player to ends of screen
         this.x = constrain(this.x, this.scaleW, levelMap[level].Canvas - this.scaleW);
         this.y = constrain(this.y, this.scaleH, levelMap[level].CanvasH - this.scaleH);
         
+        // translate accordingly
         translate(this.scaleW - this.x, this.scaleH - this.y);
     };
 };
 
+// only view objects if they are visible in camera for efficency
 var view = function(obj){
     return obj.x + (window.innerWidth / 2) - cam.x < window.innerWidth && obj.x + (window.innerWidth / 2) - cam.x > -obj.w && obj.y + (window.innerHeight / 2) - cam.y < window.innerHeight && obj.y + (window.innerHeight / 2) - cam.y > -obj.h;
-    
-    //return 1;
 };
 
 // particles for snow effect
@@ -349,11 +367,9 @@ function keyReleased (){
     keys[keyCode] = false;
 };
 
-// for reseting game when dead
+// for reseting game when player is dead
 function reset () {
-    
     trans = 50;
-    
     levelMap[level].player.x = levelMap[level].player.origx;
     levelMap[level].player.y = levelMap[level].player.origy;
     levelMap[level].player.g = 0;
@@ -423,6 +439,7 @@ function hopeSprite (x, y, s) {
 
 // class for dove
 class Hope {
+    
     constructor (x, y) {
         this.x = x; this.y = y;
         this.originy = y;
@@ -434,13 +451,13 @@ class Hope {
     }
     draw () {
         
+        // show collision box for spectator mode
         if(spectMode)
         {
             stroke(255, 255, 255);
             noFill();
             rect(this.x, this.y, this.w, this.h);
         }
-        
         
         if(view(this))
         {
@@ -490,7 +507,6 @@ class Portal {
             // start particle effect if portal is activated 
             if(portalAccess)
             {
-
                 // go to next level once collided
                 if(levelMap[level].player.x + levelMap[level].player.w >= this.x && 
                 levelMap[level].player.y + levelMap[level].player.h >= this.y &&
@@ -619,6 +635,7 @@ class Badplayer {
     
     draw () {
         
+        // show collision box for spectator mode
         if(spectMode)
         {
             stroke(255, 255, 255);
@@ -645,12 +662,12 @@ class Badplayer {
 
             // set gravity for slender
             this.y += this.g;
-
             this.g += 0.98;
 
             // if players touched enemy reset map
             if(rectCollide(this, levelMap[level].player))
             {
+                squid.play();
                 reset();
             }
         }
@@ -659,36 +676,40 @@ class Badplayer {
 
 // class for bezier collision
 class Curv {    
-  constructor (x1 ,y1 ,x2 , y2, c) {
-    this.x1 = x1;  this.y1 = y1;
-    this.x2 = x2;  this.y2 = y2;
-    this.c = c;
-      
-    this.x = 0;
-    this.y = 0;
-    this.w = 0;
-    this.h = 0;
-      
-    if(this.y1 <= this.y2)
-    {
-      this.x = this.x1 - 10;
-      this.y = this.y1 - abs(this.c);
-      this.w = this.x2 - this.x1 + 20;
-      this.h = (this.y2 - this.y1) + abs(this.c);
-    } else
-    {
-      this.x = this.x1 - 10;
-      this.y = this.y2 - abs(this.c);
-      this.w = this.x2 - this.x1 + 20;
-      this.h = (this.y1 - this.y2) + abs(this.c);
+    constructor (x1 ,y1 ,x2 , y2, c) {
+        
+        this.x1 = x1;  this.y1 = y1;
+        this.x2 = x2;  this.y2 = y2;
+        this.c = c;
+
+
+        this.x = 0;
+        this.y = 0;
+        this.w = 0;
+        this.h = 0;
+
+        // create a box around bezier curve for camera purposes
+        if(this.y1 <= this.y2)
+        {
+          this.x = this.x1 - 10;
+          this.y = this.y1 - abs(this.c);
+          this.w = this.x2 - this.x1 + 20;
+          this.h = (this.y2 - this.y1) + abs(this.c);
+        } else
+        {
+          this.x = this.x1 - 10;
+          this.y = this.y2 - abs(this.c);
+          this.w = this.x2 - this.x1 + 20;
+          this.h = (this.y1 - this.y2) + abs(this.c);
+        }
     }
-  }
   
     draw (p, e) {
       
     stroke(255);  
     strokeWeight(2);
-
+    
+    // show collision box for spectator mode
     if(spectMode)
     {
         noFill();
@@ -701,6 +722,8 @@ class Curv {
     
     if(view(this))
     {
+        
+        // collide with squid enemy
         for(var j = 0; j < e.length; j++)
         {
             if(!rectCollide(e[j], this))
@@ -724,8 +747,6 @@ class Curv {
         {
             for(var i = (p.x - this.x1) + 5; i < (this.x2 - this.x1) + (p.x - this.x2 + 30); i += 5)
             {   
-                // point(this.x1 + i, this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1));
-
                 if(bezierCollisionPoint(i, p, this) && (p.y + p.h) < (this.y + this.h + 20))
                 {
                     p.y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - p.h;
@@ -735,7 +756,7 @@ class Curv {
             }
         }
             
-        }
+    }
   }
 }
 
@@ -778,11 +799,13 @@ class StoryTxt {
             wind.play();
         }
         
+        // once in view show text
         if(this.inView || this.seeBox)
         {
             this.show /= 1.1;
         }
         
+        // for spectating
         if(this.seeBox)
         {
             fill(255);
@@ -802,13 +825,13 @@ class Checkpoint {
     }
     draw () {
         
+        // show collision box for spectator mode
         if(spectMode)
         {
             stroke(255, 255, 255);
             noFill();
             rect(this.x, this.y, this.w, this.h);
         }
-        
         
         if(view(this))
         {
@@ -823,13 +846,16 @@ class Checkpoint {
             line(this.x + this.w / 2, this.y + this.w, this.x + this.w / 2, this.y + this.h);
 
             noStroke();
+            
+            // effect
             if(this.gotit)
             {
                 this.shade /= 1.01;
                 fill(255, 255, 255, 300 - this.shade)
                 ellipse(this.x + this.w / 2, this.y + this.w / 2 - 2, this.w, this.w);
             }
-
+            
+            // if player touches portal
             if(rectCollide(this, levelMap[level].player))
             {
                 this.gotit = true;
@@ -853,6 +879,7 @@ class CamBox {
     
     draw ()
     {
+        // show collision box for spectator mode
         if(spectMode)
         {
             noFill();
@@ -860,7 +887,7 @@ class CamBox {
             rect(this.x, this.y, this.w, this.h);
         }
         
-    
+        // update live camera spanners if player touches box
         if(rectCollide(this, levelMap[level].player))
         {
             spanLiveX = this.spanY;
@@ -1334,6 +1361,8 @@ function drawLevels () {
                 break;
     }
     
+    /** DRAW ALL MAP ELEMENTS**/
+    
     for(var i = 0; i < levelMap[level].curves.length; i++)
     {
       levelMap[level].curves[i].draw(levelMap[level].player, levelMap[level].badplayer);
@@ -1369,6 +1398,12 @@ function drawLevels () {
       levelMap[level].camboxes[i].draw();
     }
     
+    levelMap[level].portal.draw();
+    levelMap[level].player.draw();
+    levelMap[level].player.update();
+    
+    
+    /** LIVE CAMERA SPANNING DETECTION **/
     
     if(levelMap[level].spanSize <= spanLiveSize)
     {
@@ -1409,9 +1444,6 @@ function drawLevels () {
         levelMap[level].spanY = spanLiveY;
     }
     
-    levelMap[level].portal.draw();
-    levelMap[level].player.draw();
-    levelMap[level].player.update();
     pop();
 };
 
