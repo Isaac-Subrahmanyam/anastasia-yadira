@@ -74,7 +74,7 @@ function setup()
         storytxt: [
             new StoryTxt ("This is a demo of Anastasia Yadira\nfor employers to check out our JS skills.\nCreators:\n- Isaac Subrahmanyam\n- Kenaniah Subrahmanyam", 250, 300, 20, -15, 
                             200, 500, 100, 100, false),
-            new StoryTxt ("Technologies used:\nReact, P5.js, Heroku", 1000, 300, 20, -10, 
+            new StoryTxt ("Technologies used:\nNetlify, P5.js, Photoshop", 1000, 300, 20, -10, 
                             900, 450, 100, 100, false),
             new StoryTxt ("Repository:\nhttps://github.com/Isaac-Subrahmanyam/anastasia-yadira", 1400, 300, 20, 10, 
                             1200, 370, 100, 100, false)
@@ -216,7 +216,7 @@ function setup()
         checkpoints: [new Checkpoint(1430, 220)],
         
         // shadow floaters
-        floaters: [new Floater(2250 - 20, 50, 50, 450)],
+        floaters: [new Floater(2250 - 20, 20, 30, 400)],
 
         },
         
@@ -1082,7 +1082,8 @@ class Player {
       
         // gravity
         this.y += this.g;
-        this.g += 0.55;
+        // this.g += 0.55;
+        this.g += 0.35;
 
         if(this.y >= levelMap[level].CanvasH)
         {
@@ -1426,7 +1427,7 @@ function draw() {
     startMusicDelay ++;
     if(startMusicDelay >= 100)
     {
-        // bgMusic.play();
+        bgMusic.play();
         startMusicDelay = 100;
     }
     
