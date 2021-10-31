@@ -71,7 +71,14 @@ function setup()
         badplayer: [],
         
         // story text
-        storytxt: [],
+        storytxt: [
+            new StoryTxt ("This is a demo of Anastasia Yadira\nfor employers to check out our JS skills.\nCreators:\n- Isaac Subrahmanyam\n- Kenaniah Subrahmanyam", 250, 300, 20, -15, 
+                            200, 500, 100, 100, false),
+            new StoryTxt ("Technologies used:\nReact, P5.js, Heroku", 1000, 300, 20, -10, 
+                            900, 450, 100, 100, false),
+            new StoryTxt ("Repository:\nhttps://github.com/Isaac-Subrahmanyam/anastasia-yadira", 1400, 300, 20, 10, 
+                            1200, 370, 100, 100, false)
+            ],
         
         // checkpoints
         checkpoints: [],
@@ -237,7 +244,7 @@ function setup()
         
         // story text
         storytxt: [
-        new StoryTxt("- demo for group 14 -", 300, 200, 30, -15,
+        new StoryTxt("Hope you enjoyed!", 300, 250, 30, -15,
         100, 200, 600, 400, false)],
         
         // checkpoints
@@ -771,7 +778,7 @@ class StoryTxt {
             wind.play();
         }
         
-        if(this.inView)
+        if(this.inView || this.seeBox)
         {
             this.show /= 1.1;
         }
@@ -1419,7 +1426,7 @@ function draw() {
     startMusicDelay ++;
     if(startMusicDelay >= 100)
     {
-        bgMusic.play();
+        // bgMusic.play();
         startMusicDelay = 100;
     }
     
