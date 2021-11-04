@@ -93,6 +93,9 @@ function setup()
         
         // checkpoints
         checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
 
     },
         
@@ -130,6 +133,9 @@ function setup()
         
         // checkpoints
         checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
 
         },
         
@@ -166,6 +172,9 @@ function setup()
         
         // checkpoints
         checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
 
         },
         
@@ -216,6 +225,9 @@ function setup()
         
         // checkpoints
         checkpoints: [new Checkpoint(1430, 220)],
+        
+        // shadow floaters
+        floaters: [new Floater(2250 - 20, 20, 30, 400)],
 
         },
         
@@ -248,6 +260,9 @@ function setup()
         
         // checkpoints
         checkpoints: [],
+        
+        // shadow floaters
+        floaters: [],
 
     },
 
@@ -1121,6 +1136,158 @@ class Player {
     }
 }
 
+// shadow floater
+class Floater
+{
+  constructor(x,y,s,r)
+  {
+    this.originX = x;
+    this.originY = y;
+    this.x = x  - s /4;
+    this.y = y  - s /2;
+    this.s = s;
+    this.w = this.s;
+    this.h = this.s;
+    this.f = 0;
+    this.r = r;
+    this.block();
+  }
+
+  image()
+  {
+    noFill();
+    quad(200, 100, 175, 150, 200, 200, 224, 150);
+    
+    triangle(217, 136, 225, 108, 209, 118);
+    triangle(232 -50, 136, 225 - 50, 108, 241 - 50, 118);
+    
+    var rotSpeed = 0.5;
+    var triDist = 60;
+    
+    noFill();
+    
+    for(var i = 0; i < 12; i ++)
+    {
+      triangle(195 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 155  - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)), 205 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 155 - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)), 200 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 146 - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)));   
+    }
+
+    arc(192, 150, 10, 10, 264, 458);
+    arc(192, 155, 10, 10, 429, 632);
+    
+    arc(207, 155, 10, 10, 264, 458);
+    arc(207, 150, 10, 10, 429, 632);
+  }
+
+  draw()
+  {
+    noFill();
+    
+    var size;
+    noStroke();
+    fill(0, 0, 0, 150);
+    for(var i = 0; i < this.r * 2; i++)
+    {
+      size = 2 + 3* sin((i / 90) * frameCount);
+      ellipse(this.originX + ((this.r - 30 + size/2)*sin(2 * i)), this.originY+ ((this.r - 30 + size /2)*cos(2 * i)), size, size);  
+    }
+    
+    if(view(this) - 100)
+    {
+        push();
+        translate(this.x, this.y);
+        translate(this.s * -1.74, this.s * -0.99);
+        scale(this.s / 100);
+        strokeWeight(7);
+        stroke(0, 0, 0, 60);
+        this.image();
+        strokeWeight(2);
+        stroke(0, 0, 0);
+        this.image();
+        pop();
+    }
+  }
+
+  movement()
+  {
+    var seekX;
+    var seekY;
+    var d;
+    
+    if(dist(levelMap[level].player.x + levelMap[level].player.w/2, levelMap[level].player.y + levelMap[level].player.h/2, this.originX , this.originY) <= this.r)
+    {
+      seekX = levelMap[level].player.x + levelMap[level].player.w/2;
+      seekY = levelMap[level].player.y + levelMap[level].player.h/2;
+    }
+    else
+    {
+      seekX = this.originX;
+      seekY = this.originY;
+    }
+    
+    var e = new createVector(this.x  + this.s /4, this.y  + this.s/2);
+    var p = new createVector(seekX, seekY);
+    
+    p.sub(e);
+    
+    d = dist(seekX, seekY, this.x, this.y);
+    
+    this.x += ( 2 *(p.x) / 200);
+    this.y += ( 2 *(p.y) / 200);
+  }
+
+  block()
+  {
+    this.meshX = [];
+    this.meshY = [];
+    this.meshW = [];
+    this.meshH = [];
+    
+    for(var i = 0; i < 12; i++)
+    {
+      this.meshX.push(this.x);
+      this.meshY.push(this.y);
+      this.meshW.push(this.s/6.5);
+      this.meshH.push(this.s/6.5);
+    }
+  }
+
+  mesh()
+  {
+    for(var i = 0; i < 12; i++)
+    {
+        this.meshX[i] = this.x + this.s / 4 - (this.s / 6.5)/2 - (this.s/1.52 + (this.s / 10) *sin(frameCount * 3)) *sin(0.5*frameCount + (i*30));    
+        this.meshY[i] = this.y + this.s/2  - (this.s / 6.5)/2 + (this.s/1.52 + (this.s / 10) * sin(frameCount * 3)) *cos(0.5*frameCount  + (i*30));
+        
+        if(spectMode)
+        {
+            stroke(255, 255, 255);
+            noFill();
+            rect(this.meshX[i], this.meshY[i], this.meshW[i], this.meshH[i]);
+        }
+    }
+  }
+
+  collision()
+  {
+    this.mesh();
+    
+    for(var i = 0; i < 12; i++)
+    {
+      if(levelMap[level].player.x + levelMap[level].player.w > this.meshX[i] && levelMap[level].player.x < this.meshX[i] + this.meshW[i] && levelMap[level].player.y + levelMap[level].player.h > this.meshY[i] && levelMap[level].player.y < this.meshY[i] + this.meshH[i])
+      {
+        reset();
+      }
+    }
+  }
+
+  apply()
+  {
+    this.collision();
+    this.draw();
+    this.movement();
+  }
+}
+
 // snow effect
 function snow (w){
     
@@ -1219,6 +1386,11 @@ function drawLevels () {
     for(var i = 0; i < levelMap[level].badplayer.length; i++) {
         levelMap[level].badplayer[i].draw();
         levelMap[level].badplayer[i].update();
+    }
+    
+    for(var i = 0; i < levelMap[level].floaters.length; i++)
+    {
+      levelMap[level].floaters[i].apply();
     }
     
     for(var i = 0; i < levelMap[level].camboxes.length; i++)
