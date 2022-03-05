@@ -1,16 +1,5 @@
 
-// for setting up levels
-var levelMap;
-
-// sound
-var bg1;
-var bg2;
-var bg3;
-var bg4;
-var scene1_rocks;
-var scene2_rocks;
-var scene3_rocks;
-var scene4_rocks;
+//// sound
 var doveS;
 var bgMusic;
 var walk;
@@ -19,263 +8,416 @@ var portalS;
 var wind;
 var squid;
 
-// preload images and sounds
-function preload() {
-    
-    // load images backdrops
-    bg1 = loadImage("images/backdrop1.jpg");
-    bg2 = loadImage("images/backdrop2.jpg");
-    bg3 = loadImage("images/backdrop3.jpg");
-    bg4 = loadImage("images/backdrop4.jpg");
-    
-    // load rock scenes on second layer
-    scene1_rocks = loadImage("images/scene_1_rocks.png");
-    scene2_rocks = loadImage("images/scene_2_rocks.png");
-    scene3_rocks = loadImage("images/scene_3_rocks.png");
-    scene4_rocks = loadImage("images/scene_4_rocks.png");
-    
-    // load game sounds
-    doveS = new Audio('sounds/whistle.mp3');
-    bgMusic = new Audio('sounds/Mae.mp3');
-    walk = new Audio("sounds/walk.mp3");
-    jumpS = new Audio("sounds/jump.mp3");
-    portalS = new Audio("sounds/portal.mp3");
-    wind = new Audio("sounds/wind.mp3");
-    squid = new Audio("sounds/squid.mp3");
-    
-    // fine tune volume and reverb settings
-    doveS.volume = 0.05;
-    doveS.reverb = 1;
-    jumpS.volume = 0.25;
-    portalS.volume = 0.05;
-    wind.volume = 1;
-    squid.volume = 0.2;
-}
+var testSpriteImg;
+var testSprite;
+var testSprite2;
+var testSprite3;
+var staggeredFrames = 8;
 
-function setup()
-{
-    createCanvas(window.innerWidth, window.innerHeight);
-    angleMode(DEGREES);
-    frameRate(60);
-    
-    levelMap = [
-        
-    // 0
-    {
-        Canvas: 1900, // canvas width 
-        CanvasH: 950, // canvas height
-        spanX: 0, spanY: 0, spanSize: 150,
-        
-        player: new Player(250, 450, 30, 100), // player
-        portal: new Portal(1700, 600, 50, 50), // portal
-        
-        // bezier curves
-        curves: [new Curv(200, 610, 705, 640, -100), new Curv(170 + 700, 590, 590 + 700, 550, -110), new Curv(170 + 800, 550, 570 + 800, 520, -75), new Curv(170 + 1350, 710, 570 + 1200, 700, -40), new Curv(170 + 1350 + 200, 710, 500 + 1200 + 200, 700, -30)],
-        
-        // camera boxes
-        camboxes: [],
-        
-        // doves
-        hope: [new Hope (1100, 400)],
-        
-        // evil black squids
-        badplayer: [],
-        
-        // story text
-        storytxt: [
-            new StoryTxt ("This is a demo of Anastasia Yadira\nfor employers to check out our JS skills.\n\nCreators:\n- Isaac Subrahmanyam\n- Kenaniah Subrahmanyam\n\nMusic:\nMae - Berlinist", 250, 300, 15, -15, 
-                            200, 500, 100, 100, false),
-            new StoryTxt ("Technologies used:\nNetlify, P5.js, Photoshop", 1000, 300, 20, -10, 
-                            900, 450, 100, 100, false),
-            new StoryTxt ("Repository:\nhttps://github.com/Isaac-Subrahmanyam/anastasia-yadira", 1400, 300, 20, 10, 
-                            1200, 370, 100, 100, false)
-            ],
-        
-        // checkpoints
-        checkpoints: [],
-        
-        // shadow floaters
-        floaters: [],
 
-    },
-        
-    // 1
-    {
-        Canvas: 2000, // canvas width
-        CanvasH: 3000, // canvas height
-        spanX: 0, spanY: 300, spanSize: 110,
-        
-        player: new Player(450, 200, 30, 100), // player
-        
-        portal: new Portal(850+ 10 + 415 + 30 - 55, 800 + 1775 - 100, 50, 50), // portal
-        
-        // bezier curves
-        curves: [new Curv(245, 620, 680, 600, -105),
-                 new Curv(900 - 5, 800 - 10, 1250, 900, -45),
-                 new Curv(1280, 1370 - 10, 1580, 1230, -50),
-                 new Curv(1055, 1600, 1220, 1600 - 10, -30),
-                 new Curv(1055 - 275, 1600 + 210, 1220 - 305, 1725, -28),
-                 new Curv(245 - 30, 620 + 1500 - 25, 690 - 5, 600 + 1500 - 30, -90),
-                 new Curv(850+ 10, 800 + 1660 - 8, 1020, 900 + 1600, -30),
-                 new Curv(850+ 10 + 415 - 55, 800 + 1775, 1020 + 405 - 55, 900 + 1625, -26)],
-        
-        // camera boxes
-        camboxes: [],
-        
-        // doves
-        hope: [new Hope(1000 - 80, 2500 - 130), new Hope(1000 - 180, 2500 - 830), new Hope(1300 - 180, 2330 - 830), new Hope(1100, 740)],
-        
-        // evil black squids
-        badplayer: [],
-        
-        // story text
-        storytxt: [],
-        
-        // checkpoints
-        checkpoints: [],
-        
-        // shadow floaters
-        floaters: [],
 
-        },
-        
-    // 2
-    {
-        Canvas: 2000, // canvas width
-        CanvasH: 1500, // canvas height
-        spanX: 0, spanY: 0, spanSize: 130,
-        
-        player: new Player(450 - 200, 200 + 650, 30, 100), // player
-        
-        portal: new Portal(1600, 270, 50, 50), // portal
-        
-        // bezier curves
-        curves: [new Curv(245 - 120, 620 + 490, 610, 600 + 530, -90),
-                new Curv(555, 620 + 343, 650, 600 + 330, -23),
-                new Curv(690, 830 - 3, 610 + 500, 605, -90),
-                new Curv(690, 830 - 3, 610 + 350, 700, -100),
-                new Curv(555 + 615, 530, 650 + 630, 480, -23),
-                new Curv(555 + 830, 430, 650 + 1250, 480, -120),
-                new Curv(555 + 830, 430, 650 + 1050, 480, -115)],
-        
-        // camera boxes
-        camboxes: [],
-        
-        // doves
-        hope: [new Hope (1200, 420),new Hope (580, 860)],
-        
-        // evil black squids
-        badplayer: [new Badplayer(1000, 500, 700, 1070, "right", 2)],
-        
-        // story text
-        storytxt: [],
-        
-        // checkpoints
-        checkpoints: [],
-        
-        // shadow floaters
-        floaters: [],
 
-        },
-        
-    // 3
-    {
-        Canvas: 3000, // canvas width
-        CanvasH: 1000, // canvas height
-        spanX: 0, spanY: 0, spanSize: 140,
-        
-        player: new Player(120, 580, 30, 100), // player
-        
-        portal: new Portal(2820, 520, 50, 50), // portal
-        
-        // bezier curves
-        curves: [new Curv(75, 800, 300, 750, -50),
-                 new Curv(50, 500, 320, 545, -20), 
-                 new Curv(430, 670, 700, 650, -80), 
-                 new Curv(430, 430, 530, 420, -35), 
-                 new Curv(610, 330, 730, 340, -20), 
-                 new Curv(800, 260, 900, 250, -35), 
-                 new Curv(400, 90, 700, 150, -30), 
-                 new Curv(165, 200, 270, 200, -20), 
-                 new Curv(1015, 340, 1230, 330, -25), 
-                 new Curv(1420, 340, 1600, 330, -20), 
-                 new Curv(1830 - 10, 360 + 10, 1960, 380, -25), 
-                 new Curv(1830 + 335 - 10, 360 + 10, 1960 + 335, 380, -25), 
-                 new Curv(1830 + 665 - 10, 360 + 10, 1960 + 665, 380, -20), 
-                 new Curv(2070 + 665, 600, 1960 + 1000, 610, -30)],
-        
-        // camera boxes
-        camboxes: [new CamBox(0, 0, 140, 
-                              1000, 0, 250, 1000),
-                   new CamBox(0, 0, 140, 
-                              100, 0, 250, 1000),
-                   new CamBox(300, 0, 150, 
-                              1400, 0, 250, 1000)],
-        
-        // doves
-        hope: [new Hope (200, 120), new Hope (1500, 240)],
-        
-        // evil black squids
-        badplayer: [new Badplayer(550, 520, 410, 660, "left", 1),
-                   new Badplayer(550, 10, 410, 660, "right", 2),
-                   new Badplayer(1150, 230, 1000, 1220, "right", 2)],
-        
-        // story text
-        storytxt: [],
-        
-        // checkpoints
-        checkpoints: [new Checkpoint(1430, 220)],
-        
-        // shadow floaters
-        floaters: [new Floater(2250 - 20, 20, 30, 400)],
-
-        },
-        
-    // 4
-    {
-        Canvas: 1900, // canvas width 
-        CanvasH: 1000, // canvas height
-        spanX: 0, spanY: 0, spanSize: 100,
-        
-        player: new Player(250, 450, 30, 100), // player
-        
-        portal: new Portal(3000, 600, 50, 50), // portal
-        
-        // bezier curves
-        curves: [new Curv(200, 610, 705, 640, -100), new Curv(170 + 700, 590, 590 + 700, 550, -110), new Curv(170 + 800, 550, 570 + 800, 520, -75), new Curv(170 + 1350, 710, 570 + 1200, 700, -40), new Curv(170 + 1350 + 200, 710, 500 + 1200 + 200, 700, -30)],
-        
-        // camera boxes
-        camboxes: [],
-        
-        // doves
-        hope: [],
-        
-        // evil black squids
-        badplayer: [],
-        
-        // story text
-        storytxt: [
-        new StoryTxt("Hope you enjoyed!", 300, 250, 30, -15,
-        100, 200, 600, 400, false)],
-        
-        // checkpoints
-        checkpoints: [],
-        
-        // shadow floaters
-        floaters: [],
-
-    },
-
-    ];
-}
+/** COLLIDERS **/
 
 // define bezier collision at a point
-function bezierCollisionPoint (i, obj1, obj2) {
-    return obj1.x + obj1.w >= (obj2.x1 + i) && 
-                obj1.y + obj1.h >= obj2.y1 + (obj2.c*sin(pi*(i/((obj2.x2-obj2.x1)/57.4)))) + (obj2.y2 - obj2.y1)*i/(obj2.x2 - obj2.x1) &&
-                obj1.x <= (obj2.x1 + i) &&
-                obj1.y + obj1.h / 1.5 <=  obj2.y1 + (obj2.c*sin(pi*(i/((obj2.x2-obj2.x1)/57.4)))) + (obj2.y2 - obj2.y1)*i/(obj2.x2 - obj2.x1);
+// give slight margin of error for a smoother feel
+function bezierCollisionPoint (i, obj1, obj2, p) {
+    return obj1.y + obj1.h + 7 >= (obj2.y1+obj2.c*p.sin((pi*(i-obj2.x1))/(obj2.x2-obj2.x1)) + ((obj2.y2-obj2.y1)*(i-obj2.x1))/(obj2.x2-obj2.x1)) && obj1.y + obj1.h - 10 <= (obj2.y1+obj2.c*p.sin((pi*(i-obj2.x1))/(obj2.x2-obj2.x1)) + ((obj2.y2-obj2.y1)*(i-obj2.x1))/(obj2.x2-obj2.x1)) &&
+    obj1.x + obj1.w >= (i) &&
+    obj1.x <= (i);
 }
+
+
+// ratio of speed resistance based on curvature
+// cut it in half for a smoother feel
+// make velocity almost look constant at all times
+function formatDeriv(y, p) {
+    return 1 - (0.5) * p.abs((2/(1+p.exp(y))  - 1));
+}
+
+// p.abs(x) -> | x |
+// p.pow(x, y) -> x ^ y
+// p.exp(x) -> e^x
+function derivResistance (i, obj, p) {
+    // i -> player point
+    // obj1 -> player
+    // obj2 -> curvature
+    // p -> pass if using p5 material (Math.pow)
+    
+    var der = obj.c * (pi/(obj.x2-obj.x1)) * p.cos((pi*(i-obj.x1))/(obj.x2-obj.x1)) + (obj.y2-obj.y1)/(obj.x2-obj.x1);
+    return formatDeriv(der, p);
+}
+
+// for rectangular collision hit boxes
+// gets x, y, w, and h of two objects and returns the collision for operations
+function rectCollide (one, two) {
+    return one.x + one.w > two.x &&
+    one.y + one.h > two.y &&
+    one.x < two.x + two.w &&
+    one.y < two.y + two.h;
+};
+
+// only view objects if they are visible in camera for efficency
+var view = function(obj){
+    return obj.x + (window.innerWidth / 2) * (100 / levelMap[level].spanSize) - cam.x < window.innerWidth * (100 / levelMap[level].spanSize) && 
+        obj.x + (window.innerWidth / 2) * (100 / levelMap[level].spanSize) - cam.x > -obj.w && 
+        obj.y + (window.innerHeight / 2) * (100 / levelMap[level].spanSize) - cam.y < window.innerHeight * (100 / levelMap[level].spanSize) && 
+        obj.y + (window.innerHeight / 2) * (100 / levelMap[level].spanSize) - cam.y > -obj.h;
+};
+
+
+
+
+
+/** OBJECTS **/
+// camera that is set to follow an element
+class Camera {
+
+    constructor (x, y) {
+        this.x = x; this.y = y;
+        this.w = window.innerWidth; this.h = window.innerHeight;
+        this.scaleW = 0;
+        this.scaleH = 0;
+    }
+
+    view (plyer, p) {
+
+        // set spangrow to be initialized with map
+        spanGrow = levelMap[level].spanSize;
+
+        // interpolation for camera following player
+        this.x = p.lerp(this.x, plyer.x + levelMap[level].spanX, 0.05);
+        this.y = p.lerp(this.y, plyer.y + levelMap[level].spanY, 0.05);
+
+        // scale based on map span grow settings
+        p.scale(spanGrow / 100);
+        
+        this.w = window.innerWidth;
+        this.h = window.innerHeight;
+
+        // scale width and height based on span grow
+        this.scaleW = (this.w / (spanGrow / 100)) / 2;
+        this.scaleH = (this.h / (spanGrow / 100)) / 2;
+
+        // constrain player to ends of screen
+        this.x = p.constrain(this.x, this.scaleW, levelMap[level].Canvas - this.scaleW);
+        this.y = p.constrain(this.y, this.scaleH, levelMap[level].CanvasH - this.scaleH);
+
+        // translate accordingly
+        p.translate(this.scaleW - this.x, this.scaleH - this.y);
+    };
+};
+
+// class for bezier collision
+class Curv {    
+    constructor (x1 ,y1 ,x2 , y2, c) {
+
+        this.x1 = x1;  this.y1 = y1;
+        this.x2 = x2;  this.y2 = y2;
+        this.c = c;
+        
+        // create x, y, w, and h around curve
+        this.x = 0;
+        this.y = 0;
+        this.w = 0;
+        this.h = 0;
+        
+        this.deleteObj = false;
+    }
+
+    draw (p) {
+
+        // create a box around bezier curve for camera purposes
+        if(this.c <= 0)
+        {
+            if(this.y1 <= this.y2)
+            {
+                this.x = this.x1 + 12;
+                this.y = this.y1 - p.abs(this.c);
+                this.w = this.x2 - this.x1 - 24;
+                this.h = (this.y2 - this.y1) + p.abs(this.c);
+            } else
+            {
+                this.x = this.x1 + 12;
+                this.y = this.y2 - p.abs(this.c);
+                this.w = this.x2 - this.x1 - 24;
+                this.h = (this.y1 - this.y2) + p.abs(this.c);
+            }
+        } else {
+            if(this.y1 <= this.y2)
+            {
+                this.x = this.x1 + 12;
+                this.y = this.y1;
+                this.w = this.x2 - this.x1 - 24;
+                this.h = (this.y2 - this.y1) + p.abs(this.c);
+            } else
+            {
+                this.x = this.x1 + 12;
+                this.y = this.y2;
+                this.w = this.x2 - this.x1 - 24;
+                this.h = (this.y1 - this.y2) + p.abs(this.c);
+            }
+        }
+
+        p.stroke(255);
+        if(this.deleteObj) p.stroke(255, 0, 0);
+        p.strokeWeight(2);
+
+        // show collision box for spectator mode
+        if(spectMode)
+        {
+            p.noFill();
+            // p.rect(this.x, this.y, this.w, this.h);
+            for(var i = this.x1; i < this.x2; i += 10)
+                p.point(i, (this.y1+(this.c*p.sin((pi*(i-(this.x1)))/(this.x2-this.x1))) + ((this.y2-this.y1)*(i-this.x1))/(this.x2-this.x1)));
+        }
+        
+        // create knobs for adjustments for spectator mode
+        if(view(this))
+        {
+            if(spectMode)
+            {
+                this.deleteObj = applyNob(this.x1, this.y1, "DEL", this.deleteObj, p, 0);
+                this.deleteObj = applyNob(this.x2, this.y2, "DEL", this.deleteObj, p, 0);
+                this.deleteObj = applyCurve(this, p, 79, "DEL", this.deleteObj);
+                this.x1 = applyNob(this.x1, this.y1, "x", this, p, 79);
+                this.y1 = applyNob(this.x1, this.y1, "y", this, p, 79);
+                this.x2 = applyNob(this.x2, this.y2, "x", this, p, 79);
+                this.y2 = applyNob(this.x2, this.y2, "y", this, p, 79);
+                this.c = applyCurve(this, p, 79, "", null);
+            }
+        }
+    }
+}
+
+// class for main player
+class Sprite {
+    constructor (spriteSheetImage, spriteW, spriteH, framejson) {
+        this.spriteSheetImage = spriteSheetImage;
+        this.spriteW = spriteW;
+        this.spriteH = spriteH;
+        this.framejson = framejson;
+        this.currentState = "idle";
+        this.stageProgress = 0;
+        this.sc = 1;
+    }
+    
+    changeStagePlusScale (stageSwitch, sc) {
+        this.currentState = stageSwitch;
+        this.sc = sc;
+    }
+    
+    changeStage (stageSwitch) {
+        this.currentState = stageSwitch;
+    }
+    
+    changeScale (sc) {
+        this.sc = sc;
+    }
+    
+    draw (x, y, w, h, p) {
+        
+        var position = p.floor(this.stageProgress/staggeredFrames) % this.framejson[this.currentState].frames;
+        var frameX = position * this.spriteW;
+        var frameY = this.framejson[this.currentState].id * this.spriteH;
+        this.stageProgress ++;
+        
+        p.push();
+        p.translate(x, y);
+        if(this.sc === -1) p.translate(this.spriteW * w, 0);
+        p.scale(w * this.sc, h);
+        var m = this.spriteSheetImage.get(frameX, frameY, this.spriteW, this.spriteH);
+        p.image(m, 0, 0);
+        p.pop();
+    }
+}
+class Player {
+
+    constructor (x, y, w, h)
+    {
+        this.x = x;  this.y = y;
+        this.xvel = 0;
+        this.yvel = 0;
+        this.origy = y;  this.origx = x;
+        this.w = w;  this.h = h;
+        this.s = 6;   this.g = 1;
+        this.CanX = 0; this.CanY = 0;
+        this.jump = false;
+        cam = new Camera(this.x,this.y);
+    }
+    update (p) {
+        
+        // show collision box around player on spectator mode
+        // apply knobs
+        if(spectMode)
+        {
+            p.stroke(255, 255, 255);
+            p.noFill();
+            p.rect(this.x, this.y, this.w, this.h);
+            this.x = applyNob(this.x, this.y, "x", this, p, 73);
+            this.y = applyNob(this.x, this.y, "y", this, p, 73);
+        }
+
+        // move with keys
+        if((keys[37] || keys[65])) this.xvel -= 2;
+        if((keys[39] || keys[68])) this.xvel += 2;
+
+        if(!keys[37] && !keys[39] && !keys[65] && !keys[68]) this.xvel *= 0.7;
+        
+        // constrain x velocity 
+        this.xvel = p.constrain(this.xvel, -this.s, this.s);
+
+        // jump with keys
+        if((keys[38] || keys[32] || keys[87]) && !this.jump && this.g <= 5) {
+            this.jump = true;
+            this.g = -10;
+            jumpS.play();
+        }
+
+        // walk sound
+        if((keys[37] || keys[65] || keys[39] || keys[68]) && this.jump === false && this.g <= 5)
+        {
+            walk.play();
+            walk.volume = 0.03;
+        } else
+        {
+            walk.volume = 0;
+            walk.currentTime = 0;
+        }
+
+        if(!movingPlayer)
+        {
+            // gravity
+            this.y += this.g;
+            this.g += 0.35;
+        }
+        
+        // max out gravity
+        if(this.g >= 10) this.g = 10;
+        
+        // reset player if past end of screen
+        if(this.y >= levelMap[level].CanvasH) reset();
+        
+        // don't go past left part of screen
+        if(this.x <= 0) this.x = 0; 
+        
+        // don't go past right part of screen
+        if(this.x >= levelMap[level].Canvas - this.w) this.x = levelMap[level].Canvas - this.w;
+        
+        // apply collisions on velocity
+        this.applyCollision(0, this.g, p);
+        this.x += this.xvel;
+        this.applyCollision(this.xvel, 0, p);
+    }
+    draw (p = p5.instance) {
+        // draw player
+        p.push();
+        p.translate(this.x + 24, this.y + 9);
+        anaSprite(-85, -40, 115, p);
+        p.pop();
+    }
+}
+
+// box collider
+class Box {
+    constructor (x, y, w, h) {
+        this.x = x; this.y = y;
+        this.w = w; this.h = h;
+        this.deleteObj = false;
+    }
+    draw (p) {
+        
+        // show collision of boxes on spectator mode
+        if(view(this))
+        {
+            if(spectMode)
+            {
+                this.deleteObj = applyNob(this.x, this.y, "DEL", this.deleteObj, p, 0);
+                this.deleteObj = applyNob(this.x, this.y, "DEL-WH", this, p, this.deleteObj);
+                this.x = applyNob(this.x, this.y, "x", this, p, 80);
+                this.y = applyNob(this.x, this.y, "y", this, p, 80);
+                this.w = applyNob(this.x, this.y, "w", this, p, 80);
+                this.h = applyNob(this.x, this.y, "h", this, p, 80);
+                
+                p.stroke(255, 255, 255);
+                if(this.deleteObj) p.stroke(255, 0, 0);
+                p.noFill();
+                p.rect(this.x, this.y, this.w, this.h);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+/** VISUAL **/
+// sprite for anastasia
+function ana (stage, p) {
+    
+    testSprite.draw(0, 0, 1, 1, p);
+    
+    if(stage === "stag")
+    {
+        testSprite.changeStage("idle");
+    }
+
+    if(stage === "move" && levelMap[level].player.jump === false)
+    {
+        testSprite.changeStagePlusScale("walking", 1);
+    }
+    
+    if(stage === "move2" && levelMap[level].player.jump === false)
+    {
+        testSprite.changeStagePlusScale("walking", -1);
+    }
+
+    if(stage === "move" && levelMap[level].player.jump === true)
+    {
+
+        testSprite.changeStagePlusScale("jump", 1);
+    }
+    
+    if(stage === "move2" && levelMap[level].player.jump === true)
+    {
+
+        testSprite.changeStagePlusScale("jump", -1);
+    }
+};
+function anaSprite(x, y, s, p){
+
+    p.push();
+    p.translate(x, y);
+    p.scale(s / 100);
+
+    // right
+    if((keys[39] || keys[68]))
+    {
+        ana("move", p);
+    }
+
+    // left
+    else if((keys[37] || keys[65]))
+    {
+        ana("move2", p);
+    }
+
+    else
+    {
+        ana("stag", p);
+    }
+    p.pop();
+};
+
+
+
+
+    
+
+/** LEVELS **/
+var levelMap;
 
 // current level
 var level = 0;
@@ -284,7 +426,472 @@ var level = 0;
 var scoutMap = [0, 0];
 
 // spectator mode
-var spectMode = false;
+var spectMode = true;
+
+var spriteImages;
+var backgroundImages;
+
+// for setting up levels
+function populateMaps (p) {
+    
+    backgroundImages = {
+        all: {},
+        isolation: {
+            desolation: [
+                p.loadImage("images/backdrop1.jpg"),
+                p.loadImage("images/map1.png"),
+                p.loadImage("images/clouds.png"),
+                p.loadImage("images/moonstag.png")
+            ]
+        }
+    };
+    
+    testSpriteImg = p.loadImage("images/knight2.png");
+    testSprite = new Sprite(testSpriteImg, 128, 128, {
+        idle: {
+            id: 8,
+            frames: 7
+        },
+        walking: {
+            id: 0,
+            frames: 9
+        },
+        jump: {
+            id: 9,
+            frames: 12
+        },
+    });
+    
+    testSprite2 = new Sprite(testSpriteImg, 128, 128, {
+        flies: {
+            id: 13,
+            frames: 12
+        },
+    });
+    
+    testSprite3 = new Sprite(testSpriteImg, 128, 128, {
+        flies: {
+            id: 13,
+            frames: 12
+        },
+    });
+    
+    levelMap = [
+    {
+        bgImg: [backgroundImages.isolation.desolation[0]],
+        bgImg2: [backgroundImages.isolation.desolation[1]],
+        fgImg: [backgroundImages.isolation.desolation[2]],
+        stagImg: [[backgroundImages.isolation.desolation[3], {xOffset: -1500, yOffset: -2000}]],
+        
+        Canvas: 20000, // canvas width 
+        CanvasH: 10000, // canvas height
+        spanX: 0, spanY: 0, spanSize: 50,
+        
+        player: new Player(250 + 1000, 9200, 30, 100), // player
+        
+        // portal: new Portal(3000, 600, 50, 50), // portal
+        
+        // bezier curves
+        curves: [new Curv(1058, 9466, 1526, 9474, -4),new Curv(1526, 9474, 1863, 9516, -4),new Curv(1863, 9516, 2342, 9406, -27),new Curv(2342, 9406, 2705, 9244, -7),new Curv(2705, 9244, 3121, 9243, -7),new Curv(3121, 9243, 3597, 9236, 5),new Curv(3597, 9236, 4052, 9125, 8),new Curv(3526, 8986, 3987, 9112, -7),new Curv(3596, 8976, 4098, 8879, 1),new Curv(3516, 8801, 4037, 8870, -7),new Curv(3040, 8717, 3267, 8747, -16),new Curv(2550, 8622, 2841, 8681, -20),new Curv(2105, 8554, 2322, 8567, -13),new Curv(2474, 8486, 2728, 8286, -34),new Curv(2964, 8292, 3092, 8217, -28),new Curv(3618, 8331, 4610, 8314, -8),new Curv(4610, 8314, 5020, 8415, 9),new Curv(5020, 8415, 5362, 8543, -8),new Curv(5362, 8543, 6134, 8634, 24),new Curv(6556, 8740, 6799, 8750, 7),new Curv(6799, 8750, 6946, 8798, -20),new Curv(6946, 8798, 7628, 8897, 38),new Curv(7628, 8897, 7995, 8901, 0),new Curv(8404, 8982, 8546, 8912, -23),new Curv(3092, 8217, 3318, 8235, -13),new Curv(6134, 8634, 6318, 8683, -18),new Curv(7995, 8901, 8266, 9012, -7),new Curv(877, 9348, 1058, 9466, -5),new Curv(8654, 8780, 8855, 8689, -1),new Curv(8844, 8628, 9084, 8591, 0),new Curv(9028, 8559, 9334, 8578, -12),new Curv(9247, 8531, 9704, 8607, -30),new Curv(9704, 8607, 9913, 8393, -43),new Curv(9913, 8393, 10360, 8236, -25),new Curv(9694, 7883, 10302, 8187, -38),new Curv(9769, 7877, 10247, 7716, 13),new Curv(9687, 7546, 10178, 7689, -17),new Curv(8616, 7103, 9687, 7546, -11),new Curv(7507, 6778, 8616, 7103, -23),new Curv(6272, 6713, 7507, 6778, -40),new Curv(4714, 6854, 5963, 6733, 3),new Curv(3625, 6904, 4714, 6854, 16),new Curv(1590, 6818, 3305, 6903, 11),new Curv(1270, 6761, 1590, 6818, 0),new Curv(1022, 6774, 1270, 6761, -13),new Curv(753, 6636, 1084, 6615, 12),new Curv(-10, 6633, 753, 6636, 1),new Curv(120, 6587, 1038, 6215, 6),new Curv(23, 6092, 615, 6190, -8),new Curv(615, 6190, 910, 6221, -14),new Curv(751, 5660, 978, 5573, -20),new Curv(116, 6056, 751, 5660, -22),new Curv(50, 5347, 746, 5499, 19),new Curv(271, 5266, 762, 5109, -29),new Curv(762, 5109, 1056, 5041, -2),new Curv(1056, 5041, 2650, 4906, -30),new Curv(2650, 4906, 4249, 5021, -27),new Curv(4249, 5021, 5445, 5058, 25),new Curv(5445, 5058, 6698, 4859, 16),new Curv(6698, 4859, 7143, 4757, -8),new Curv(7143, 4757, 8057, 4610, 27),new Curv(8057, 4610, 8292, 4714, 58),new Curv(8292, 4714, 8718, 4582, -7),new Curv(8718, 4582, 8844, 4711, 28),new Curv(8844, 4711, 8996, 4832, -9),new Curv(8996, 4832, 9605, 4707, -1),new Curv(9660, 4917, 10098, 4825, -47),new Curv(10098, 4825, 10301, 4771, 16),new Curv(10301, 4771, 10433, 4750, -10),new Curv(746, 5499, 897, 5536, -1),new Curv(156, 5324, 271, 5266, 2),new Curv(10337, 1421, 10661, 1416, -46),new Curv(10661, 1416, 10970, 1258, 67),new Curv(10970, 1258, 11470, 1262, -12),new Curv(11470, 1262, 11594, 1405, -6),new Curv(11594, 1405, 12574, 1396, -5),new Curv(12574, 1396, 13680, 1389, -2),new Curv(13680, 1389, 14527, 1398, 2),new Curv(14527, 1398, 14777, 1394, 3),new Curv(14777, 1394, 15027, 1356, -16),new Curv(8443, 4056, 10308, 4716, -104),new Curv(7805, 3866, 8443, 4056, 18),new Curv(7515, 3666, 7805, 3866, 10),new Curv(7397, 3727, 7515, 3666, -23),new Curv(7200, 3725, 7278, 3698, -17),new Curv(7021, 3637, 7105, 3665, -16),new Curv(7146, 3555, 7222, 3485, -12),new Curv(6945, 3368, 7138, 3423, -14),new Curv(7098, 3287, 7187, 3191, -21),new Curv(7253, 3132, 7368, 3063, -1),new Curv(7431, 2998, 7570, 2901, -7),new Curv(7671, 2829, 7772, 2752, -13),new Curv(7859, 2683, 7927, 2619, -9),new Curv(7978, 2567, 8275, 2409, -34),new Curv(8372, 2306, 8650, 2129, -50),new Curv(8650, 2129, 8898, 2023, 19),new Curv(9053, 1926, 9411, 1706, -46),new Curv(9599, 1644, 9856, 1506, -21),new Curv(10129, 1424, 10337, 1421, 26),new Curv(9989, 1446, 10129, 1424, -9),new Curv(15576, 2143, 16238, 2023, -40),new Curv(15011, 2519, 15421, 2469, -43),new Curv(14541, 3034, 14749, 2924, -25),new Curv(14256, 3574, 14412, 3468, -18),new Curv(13919, 4005, 14089, 3833, -40),new Curv(13485, 4294, 13723, 4200, -31),new Curv(13374, 4392, 13485, 4294, 4),new Curv(12761, 4893, 13300, 4709, -32),new Curv(12654, 4939, 13273, 5075, -22),new Curv(12939, 5285, 13386, 5129, -33),new Curv(12808, 5333, 13261, 5469, -18),new Curv(12937, 6340, 14188, 6526, -29),new Curv(13052, 5682, 13373, 5533, -24),new Curv(12950, 5752, 13285, 5815, -31),new Curv(13099, 5999, 13344, 5856, -28),new Curv(13044, 6038, 13219, 6104, -13),new Curv(13145, 6194, 13298, 6162, -13),new Curv(13004, 6232, 13249, 6318, -16),new Curv(14188, 6526, 15624, 7061, -31),new Curv(15624, 7061, 17333, 7513, 71),new Curv(17333, 7513, 17553, 7554, -5),new Curv(17553, 7554, 17763, 7499, 13),new Curv(17763, 7499, 17978, 7525, -17),new Curv(17978, 7525, 18370, 7408, -30),new Curv(18370, 7408, 18532, 7411, -4),new Curv(18532, 7411, 19268, 7405, -18),new Curv(19268, 7405, 19380, 7432, -6),new Curv(19380, 7432, 19500, 7427, -21),new Curv(19500, 7427, 19718, 7473, -2),new Curv(19718, 7473, 19840, 7611, 55),new Curv(7094, 3718, 7228, 3791, 36),new Curv(7278, 3698, 7399, 3808, 60),
+        ],
+        
+        boxes: [new Box(736, 9045, 170, 528),new Box(8654, 8780, 29, 72),new Box(8846, 8632, 26, 136),new Box(9028, 8559, 23, 137),new Box(9247, 8531, 34, 239),new Box(4047, 9132, 4, 417),new Box(3942, 9546, 103, 521),new Box(6272, 6713, 88, 253),new Box(5903, 6742, 97, 244),new Box(3625, 6910, 65, 241),new Box(3236, 6911, 108, 228),new Box(994, 6635, 29, 153),new Box(994, 6635, 88, 34),new Box(845, 6651, 219, 48),new Box(753, 6687, 288, 47),new Box(9590, 4750, 63, 288),new Box(9517, 4730, 100, 100),new Box(14974, 1359, 58, 300),new Box(7039, 3664, 71, 90),new Box(7235, 3703, 47, 150),new Box(7405, 3723, 102, 95),],
+        
+        // camera boxes
+        camboxes: [],
+    
+        // doves
+        hope: [],
+        
+        // evil black squids
+        badplayer: [],
+        
+        // story text
+        storytxt: [],
+            
+        // checkpoints
+        checkpoints: [],
+
+        // shadow floaters
+        floaters: [],
+        },
+    ];
+};
+
+// snow effect
+// particles for snow effect
+var particles = { x: [], y: [], s: [], r: [], upAmount: [] };
+function snow (p) {
+
+    p.push();
+    p.noStroke();
+
+    //particles
+    for(var i = 0; i < particles.x.length; ++i)
+    {
+        //fill
+        p.fill(255, 255, 255, 200);
+        p.ellipse(particles.x[i], particles.y[i], particles.s[i], particles.s[i]); // circle for particle
+
+        particles.y[i] += particles.s[i]; // particl goes up
+        particles.x[i] -= 0.5;
+
+        if(particles.y[i] >= cam.y + window.innerHeight + 600) // is particle is totally shrunk
+        {
+            //reset particle
+            particles.x[i] = p.random(-600, window.innerWidth + 600) + cam.x - (window.innerWidth / 2);
+            particles.y[i] = -10 + cam.y - (window.innerHeight / 2);
+            particles.s[i] = p.random(1, 3);
+        }
+    }
+
+    //appear
+    if(particles.x.length <= 400)
+    {
+        particles.x.push(
+            p.random(0, window.innerWidth) + 
+            cam.x - (window.innerWidth / 2));
+        particles.y.push(
+            p.random(-600, -10) + 
+            cam.y - (window.innerHeight / 2));
+        particles.s.push(p.random(1, 3));
+        particles.r.push(p.random(0, 360));
+    }
+    p.pop();
+};
+
+// draw all elements
+function drawLevels (p) {
+
+    portalAccess = true;
+
+    p.push();
+    p.translate(scoutMap[0], scoutMap[1]);
+    cam.view(levelMap[level].player, p);
+
+    /** DRAW ALL MAP ELEMENTS**/
+    
+    // IN BACK IMAGES
+    for(var i = 0; i < levelMap[level].bgImg.length; i++) p.image(levelMap[level].bgImg[i], 0, 0);
+    
+    for(var i = 0; i < levelMap[level].stagImg.length; i++)
+        p.image(levelMap[level].stagImg[i][0], 
+        cam.x - (window.innerWidth / 2) + levelMap[level].stagImg[i][1].xOffset, 
+        cam.y - (window.innerHeight / 2) + levelMap[level].stagImg[i][1].yOffset);
+
+    for(var i = 0; i < levelMap[level].bgImg2.length; i++) p.image(levelMap[level].bgImg2[i], 0, 0);
+    
+    for(var i = 0; i < levelMap[level].curves.length; i++) levelMap[level].curves[i].draw(p);
+    for(var i = 0; i < levelMap[level].boxes.length; i++) levelMap[level].boxes[i].draw(p);
+
+    for(var i = 0; i < levelMap[level].hope.length; i++) {
+        levelMap[level].hope[i].draw();
+        if(levelMap[level].hope[i].collected === false) portalAccess = false;
+    }
+
+    for(var i = 0; i < levelMap[level].storytxt.length; i++) levelMap[level].storytxt[i].draw();
+    for(var i = 0; i < levelMap[level].checkpoints.length; i++) levelMap[level].checkpoints[i].draw();
+
+    for(var i = 0; i < levelMap[level].badplayer.length; i++) {
+        levelMap[level].badplayer[i].draw();
+        levelMap[level].badplayer[i].update();
+    }
+
+    for(var i = 0; i < levelMap[level].floaters.length; i++) levelMap[level].floaters[i].apply();
+    for(var i = 0; i < levelMap[level].camboxes.length; i++) levelMap[level].camboxes[i].draw();
+
+    // levelMap[level].portal.draw();
+    levelMap[level].player.draw(p);
+    levelMap[level].player.update(p);
+    
+    testSprite2.changeStage("flies");
+    testSprite3.changeStage("flies");
+    testSprite2.draw(4900, 8200 + 50, 1, 1, p);
+    testSprite3.draw(18250, 7250, 1, 1, p);
+    
+    /** IN FRONT IMAGES **/
+    for(var i = 0; i < levelMap[level].fgImg.length; i++) p.image(levelMap[level].fgImg[i], 0, 0);
+
+    // LIVE CAMERA SPANNING DETECTION
+    if(levelMap[level].spanSize <= spanLiveSize) levelMap[level].spanSize += 0.2;
+    if(levelMap[level].spanSize >= spanLiveSize) levelMap[level].spanSize -= 0.2;
+    if(levelMap[level].spanSize === spanLiveSize) levelMap[level].spanSize = spanLiveSize;
+
+    if(levelMap[level].spanX <= spanLiveX) levelMap[level].spanX += 2;
+    if(levelMap[level].spanX >= spanLiveX) levelMap[level].spanX -= 2;
+    if(levelMap[level].spanX === spanLiveX) levelMap[level].spanX = spanLiveX;
+
+    if(levelMap[level].spanY <= spanLiveY) levelMap[level].spanY += 2;
+    if(levelMap[level].spanY >= spanLiveY) levelMap[level].spanY -= 2;
+    if(levelMap[level].spanY === spanLiveY) levelMap[level].spanY = spanLiveY;
+
+    p.pop();
+};
+
+
+
+
+
+/** COLLISIONS **/
+Player.prototype.applyCollision = function(xvel, yvel, p) {
+    
+    p.stroke(255, 0, 0);
+    p.strokeWeight(5);
+    
+    // get midpoint of player for bezier collision
+    var middlepoint = this.x + this.w / 2;
+
+    for(var i = 0; i < levelMap[level].curves.length; i++)
+    {
+        var c = levelMap[level].curves[i];
+        if(!view(c)) continue;   
+        if(!rectCollide(this, c)) continue;
+        if(!(bezierCollisionPoint(middlepoint, this, c, p))) continue;
+        
+        if (yvel > 0) {
+            this.y = (c.y1+c.c*p.sin((pi*(middlepoint-c.x1))/(c.x2-c.x1)) + ((c.y2-c.y1)*(middlepoint-c.x1))/(c.x2-c.x1)) - this.h;
+            this.jump = false;
+            this.g = 0;
+            this.xvel = (derivResistance(middlepoint, c, p)) * this.xvel;
+        }
+    }
+    
+    for(var i = 0; i < levelMap[level].boxes.length; i++)
+    {
+        var b = levelMap[level].boxes[i];
+        
+        if(view(b))
+        {
+            if(!rectCollide(this, b)) continue;
+            
+            if (xvel < 0) {
+                this.x = b.x + b.w;
+                this.xvel = 0;
+            }
+            if (xvel > 0) {
+                this.x = b.x - this.w;
+                this.xvel = 0;
+            }
+            if (yvel < 0) {
+                this.y = b.y + b.h;
+                this.g = 0;
+            }
+            if (yvel > 0) {
+                this.y = b.y - this.h;
+                this.jump = false;
+                this.g = 0;
+            }
+            
+        }
+    }
+    
+};
+
+
+
+
+
+/** LEVEL EDITOR ASSETS **/
+// clicked state
+var clickDalay = 0;
+var clicked = false;
+var imgGround = "";
+var img;
+var input;
+
+function applyNob (setx, sety, xory, obj, p, k) {
+
+    let mX = p.mouseX * (100 / levelMap[level].spanSize) + cam.x - (window.innerWidth / 2) * (100 / levelMap[level].spanSize);
+    let mY = p.mouseY * (100 / levelMap[level].spanSize) + cam.y - (window.innerHeight / 2) * (100 / levelMap[level].spanSize);
+    
+    if(xory === "DEL")
+    {
+        if(p.mouseIsPressed && mX > setx - 30 && mX < setx + 20 + 30 && mY > sety - 30 && mY < sety + 20 + 30 && keys[85]) obj = true;
+        return obj;
+    }
+    
+    if(xory === "DEL-WH")
+    {
+        setx -= (obj.x - obj.w);
+        sety -= (obj.y - obj.h);
+        if(p.mouseIsPressed && mX > setx + obj.x - 30 && mX < setx + obj.x + 20 + 30 && mY > sety + obj.y - 30 && mY < sety + obj.y + 20 + 30 && keys[85]) k = true;
+        return k;
+    }
+
+    if(xory === "x" || xory === "y")
+    {
+        if(p.mouseIsPressed && mX > setx - 30 && mX < setx + 20 + 30 && mY > sety - 30 && mY < sety + 20 + 30 && keys[k])
+        {
+            setx = mX - 10;
+            sety = mY - 10;
+            movingPlayer = true;
+        }
+        else
+        {
+            movingPlayer = false;
+        }
+        
+        p.stroke(255, 255, 255, 50);
+        p.fill(255, 255, 255, 30);
+        p.ellipse(setx - 30 + 40, sety - 30 + 40, 20 + 60, 20 + 60);
+
+        p.fill(255, 255, 255, 100);
+
+        if(mX > setx && mX < setx + 20 && mY > sety && mY < sety + 20) p.fill(255, 255, 255, 150);
+
+        p.rect(setx, sety, 20, 20);
+        
+        if(xory === "x") return setx;
+        else return sety;
+    }
+    else if (xory !== "DEL" && xory !== "DEL-WH")
+    {   
+        setx -= (obj.x - obj.w);
+        sety -= (obj.y - obj.h);
+        
+        if(p.mouseIsPressed && mX > setx + obj.x - 30 && mX < setx + obj.x + 20 + 30 && mY > sety + obj.y - 30 && mY < sety + obj.y + 20 + 30 && keys[k])
+        {
+            setx = mX - 10 - obj.x;
+            sety = mY - 10 - obj.y;
+            movingPlayer = true;
+        }
+        else
+        {
+            movingPlayer = false;
+        }
+        
+        p.stroke(255, 255, 255, 50);
+        p.fill(255, 255, 255, 30);
+        p.ellipse(setx + obj.x - 30 + 40, sety + obj.y - 30 + 40, 20 + 60, 20 + 60);
+        p.fill(255, 255, 255, 100);
+        
+        if(mX > setx + obj.x && mX < setx + obj.x + 20 && mY > sety + obj.y && mY < sety + obj.y + 20) p.fill(255, 255, 255, 150);
+
+        p.rect(setx + obj.x, sety + obj.y, 20, 20);
+        
+        if(xory === "w") return setx;
+        else return sety;
+    }
+};
+function applyCurve (obj, p, k, xory, obj2) {   
+
+    let setx = (obj.x1 + obj.x2) / 2;
+    let sety = (obj.y1 + obj.y2) / 2 + obj.c - 10;
+
+    p.stroke(255, 255, 255, 50);
+    p.fill(255, 255, 255, 30);
+    p.ellipse(setx - 30 + 40, sety - 30 + 40, 20 + 60, 20 + 60);
+    p.fill(255, 255, 255, 100);
+
+    let mX = p.mouseX * (100 / levelMap[level].spanSize) + cam.x - (window.innerWidth / 2) * (100 / levelMap[level].spanSize);
+    let mY = p.mouseY * (100 / levelMap[level].spanSize) + cam.y - (window.innerHeight / 2) * (100 / levelMap[level].spanSize);
+
+    if(mX > setx && mX < setx + 20 && mY > sety && mY < sety + 20) p.fill(255, 255, 255, 150);
+    if(p.mouseIsPressed && mX > setx - 30 && mX < setx + 20 + 30 && mY > sety - 30 && mY < sety + 20 + 30 && keys[k]) sety = mY - 10;
+
+    p.rect(setx, sety, 20, 20);
+    
+    if(xory === "DEL")
+    {
+        if(p.mouseIsPressed && mX > setx - 30 && mX < setx + 20 + 30 && mY > sety - 30 && mY < sety + 20 + 30 && keys[85]) obj2 = true;
+            
+            return obj2;
+    }
+
+    return -(((obj.y1 + obj.y2) / 2 - 10) - sety);
+}
+
+// draw level editor
+function buttonAsset (x, y, w, h, txt, txtSize, state, p) {
+    p.fill(255, 255, 255, 50);
+    p.textSize(txtSize);
+    
+    if(p.mouseX > x && p.mouseX < x + w && p.mouseY > y && p.mouseY < y + h)
+    {
+        p.fill(255, 255, 255, 100);
+        
+        if(p.mouseIsPressed && !clicked)
+        {
+            switch(state)
+            {
+                case "curve":
+                    levelMap[level].curves.push(
+                        new Curv(cam.x - (window.innerWidth / 2) + 150, cam.y - (window.innerHeight / 2) + 80, cam.x - (window.innerWidth / 2) + 500, cam.y - (window.innerHeight / 2) + 80, -40)
+                    );
+                    break;
+                case "print":
+                    var writer = p.createWriter("level.txt");
+                    
+                    for(var i = 0; i < levelMap[level].curves.length; i++)
+                    {
+                        if(!levelMap[level].curves[i].deleteObj)
+                            writer.write("new Curv(" + p.round(levelMap[level].curves[i].x1) + ", " + p.round(levelMap[level].curves[i].y1) + ", " + p.round(levelMap[level].curves[i].x2) + ", " + p.round(levelMap[level].curves[i].y2) + ", " + p.round(levelMap[level].curves[i].c)+ "),");
+                    }
+                    writer.write("\n\n");
+                    
+                    for(var i = 0; i < levelMap[level].boxes.length; i++)
+                    {
+                        if(!levelMap[level].boxes[i].deleteObj)
+                            writer.write("new Box(" + p.round(levelMap[level].boxes[i].x) + ", " + p.round(levelMap[level].boxes[i].y) + ", " + p.round(levelMap[level].boxes[i].w) + ", " + p.round(levelMap[level].boxes[i].h) + "),");
+                    }
+
+                    writer.close();
+                    break;
+                case "box":
+                    levelMap[level].boxes.push(
+                        new Box(cam.x - (window.innerWidth / 2) + 150, cam.y - (window.innerHeight / 2) + 120, 100, 100)
+                    );
+                    break;
+                case "spect":
+                    switch(spectMode)
+                    {
+                        case true:
+                                spectMode = false;
+                            break;
+                        case false:
+                                spectMode = true;
+                            break;
+                    }
+                    break;
+            }
+            
+            clickDalay = 50;
+            clicked = true;
+        }
+    }
+    
+    p.rect(x, y, w, h);
+    p.text(txt, x + w / 2, y + h / 2);
+};
+function spectateModeAssets (p) {
+
+    p.stroke(255);
+    p.fill(255, 255, 255, 50);
+
+    if(spectMode)
+    {
+        p.rect(0, 0, 100, window.innerHeight);
+
+        buttonAsset(10, 10, 80, 80, "CURVE", 20, "curve", p);
+        buttonAsset(10, 10 + 90, 80, 80, "BOX", 20, "box", p);
+        buttonAsset(100, 0, 80, 30, "PRINT", 20, "print", p);
+    }
+
+    buttonAsset(window.innerWidth - 100, 0, 100, 30, "SPECT: " + spectMode, 17, "spect", p);
+
+    clickDalay --;
+
+    if(clickDalay <= 0)
+    {
+        clickDalay = 0;
+        clicked = false;
+    }
+};
+
+
+
+
+
 
 // transition for scenes
 var trans = 0;
@@ -295,7 +902,7 @@ var portalAccess = false;
 // for curve detection
 var pi = Math.PI;
 
-// for live camera spanning
+// for live camera span;ning
 var spanLiveSize;
 var spanLiveX;
 var spanLiveY;
@@ -303,1171 +910,82 @@ var spanLiveY;
 // camera for game
 var cam;
 
-// for rectangular collision hit boxes
-function rectCollide (one, two) {
-    return one.x + one.w > two.x &&
-        one.y + one.h > two.y &&
-        one.x < two.x + two.w &&
-        one.y < two.y + two.h;
-};
-
 var spanGrow;
 
-// camera that is set to follow an element (player in this case)
-class Camera {
-
-    constructor (x, y) {
-        this.x = x; this.y = y; this.w = window.innerWidth; this.h = window.innerHeight;
-        this.scaleW = 0;
-        this.scaleH = 0;
-    }
-    
-    view (plyer) {
-        
-        // set spangrow to be initialized with map
-        spanGrow = levelMap[level].spanSize;
-        
-        // interpolation for camera following player
-        this.x = lerp(this.x, plyer.x + levelMap[level].spanX, 0.05);
-        this.y = lerp(this.y, plyer.y + levelMap[level].spanY, 0.05);
-        
-        // scale based on map span grow settings
-        scale(spanGrow / 100);
-        
-        this.w = window.innerWidth;
-        this.h = window.innerHeight;
-        
-        // scale width and height based on span grow
-        this.scaleW = (this.w / (spanGrow / 100)) / 2;
-        this.scaleH = (this.h / (spanGrow / 100)) / 2;
-        
-        // constrain player to ends of screen
-        this.x = constrain(this.x, this.scaleW, levelMap[level].Canvas - this.scaleW);
-        this.y = constrain(this.y, this.scaleH, levelMap[level].CanvasH - this.scaleH);
-        
-        // translate accordingly
-        translate(this.scaleW - this.x, this.scaleH - this.y);
-    };
-};
-
-// only view objects if they are visible in camera for efficency
-var view = function(obj){
-    return obj.x + (window.innerWidth / 2) - cam.x < window.innerWidth && obj.x + (window.innerWidth / 2) - cam.x > -obj.w && obj.y + (window.innerHeight / 2) - cam.y < window.innerHeight && obj.y + (window.innerHeight / 2) - cam.y > -obj.h;
-};
-
-// particles for snow effect
-var particles = { x: [], y: [], s: [], r: [], upAmount: [] };
+var movingPlayer = false;
 
 /** Key stuff **/
 var keys = [];
-function keyPressed () {
-    keys[keyCode] = true;
-};
-function keyReleased (){
-    keys[keyCode] = false;
-};
 
 // for reseting game when player is dead
 function reset () {
     trans = 50;
     levelMap[level].player.x = levelMap[level].player.origx;
     levelMap[level].player.y = levelMap[level].player.origy;
-    levelMap[level].player.g = 0;
-
-};
-
-// hope sprite
-function hope () {
-
-    push();
-    translate(270, 226);
-    scale(2.7);
-    rotate(- 4 + sin(frameCount * 10) * 12);
-    ellipse(12,0,25,4);
-    rotate(1 + sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 + sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 + sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 + sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 + sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 + sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    pop();
-    
-    push();
-    translate(239, 226);
-    scale(-2.7);
-    rotate(- 4 - sin(frameCount * 10) * 12);
-    ellipse(12,0,25,4);
-    rotate(1 - sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 - sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 - sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 - sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 - sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    rotate(1 - sin(frameCount * 10) * 10);
-    ellipse(12,0,25,4);
-    pop();
-}
-function hopeSprite (x, y, s) {
-    push();
-    translate(x, y + sin(frameCount * 5) * 4);
-    scale(s / 100);
-    noFill();
-    stroke(255, 255, 255, 30);
-    strokeWeight(5);
-    ellipse(255,224,31,37);
-    hope();
-    stroke(255, 255, 255);
-    strokeWeight(1);
-    hope();
-    strokeWeight(2);
-    ellipse(255,224,25,30);
-    ellipse(251,220,1,1);
-    ellipse(259,220,1,1);
-    triangle(250, 226, 254, 230, 258, 226);
-    pop();
-}
-
-// class for dove
-class Hope {
-    
-    constructor (x, y) {
-        this.x = x; this.y = y;
-        this.originy = y;
-        this.w = 40; this.h = 40;
-        this.s = 40;
-        this.collected = false;
-        this.anim = this.s;
-        this.fadeIn = 0;
-    }
-    draw () {
-        
-        // show collision box for spectator mode
-        if(spectMode)
-        {
-            stroke(255, 255, 255);
-            noFill();
-            rect(this.x, this.y, this.w, this.h);
-        }
-        
-        if(view(this))
-        {
-            // if collect start effect
-            if (this.collected === true)
-            {
-                noStroke();
-                fill(255, 255, 255, 50 - this.fadeIn);
-                ellipse(this.x + this.s / 2, this.originy + this.fadeIn / 2, this.fadeIn * 1.5, this.fadeIn * 1.5);
-                ellipse(this.x + this.s / 2, this.originy + this.fadeIn / 2, this.fadeIn, this.fadeIn);
-                ellipse(this.x, this.originy, this.fadeIn, this.fadeIn);
-                ellipse(this.x + this.fadeIn, this.originy, this.fadeIn, this.fadeIn);
-            }
-            
-            hopeSprite(this.x - 108, this.y - 94, 50);
-            
-            // play dove chirps
-            if(rectCollide(this, levelMap[level].player) && this.collected === false)
-            {
-                doveS.play();
-                this.collected = true;
-            }
-        }
-        
-        // make bird fly if collected
-        if (this.collected === true)
-        {
-            this.y -= 3;
-            this.fadeIn += 2;
-        }
-    }
-}
-
-// class for portal
-class Portal {
-    
-    constructor (x, y, w, h) {
-        this.particles = { x: [], y: [], s: [], r: [], upAmount: [] };
-        this.x = x;  this.y = y;
-        this.w = w;  this.h = h;
-    }
-    
-    draw () {
-        
-        if(view(this))
-        {
-            // start particle effect if portal is activated 
-            if(portalAccess)
-            {
-                // go to next level once collided
-                if(levelMap[level].player.x + levelMap[level].player.w >= this.x && 
-                levelMap[level].player.y + levelMap[level].player.h >= this.y &&
-                levelMap[level].player.x <= this.x + this.w &&
-                levelMap[level].player.y <=  this.y + this.h)
-                {
-                    portalS.play();
-                    reset();
-                    level ++;
-                }
-
-                // particle effect
-                fill(250, 242, 243, 150);
-                noStroke();
-
-                for(var i = 0; i < this.particles.x.length; ++i)
-                {
-                    push();
-                    translate(this.particles.x[i], this.particles.y[i]);
-                    rotate(this.particles.r[i]);
-                    ellipse(0, this.particles.upAmount[i], this.particles.s[i], this.particles.s[i]);
-                    pop();
-
-                    this.particles.s[i] -= 2;
-                    this.particles.upAmount[i] += this.particles.s[i] / 20;
-
-                    if(this.particles.s[i] <= 0)
-                    {
-                        this.particles.x[i] = this.x + this.w / 2;
-                        this.particles.y[i] = this.y + this.h / 2;
-                        this.particles.s[i] = random(0, this.w);
-                        this.particles.r[i] = random(0, 360);
-                        this.particles.upAmount[i] = 0;
-                    }
-
-                }
-
-                if(this.particles.x.length <= 30)
-                {
-                    this.particles.x.push(10000);
-                    this.particles.y.push(10000);
-                    this.particles.s.push(random(0, this.w));
-                    this.particles.r.push(random(0, 360));
-                }
-            }
-
-            // base portal
-            noFill();
-            stroke(255, 255, 255, 50);
-            strokeWeight(5);
-            ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
-            strokeWeight(8);
-            ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
-            stroke(255, 255, 255);
-            strokeWeight(2);
-            ellipse(this.x + this.w / 2, this.y + this.h / 2, this.w/1.1, this.h/1.1);
-        }
-    }
-};
-
-// slender enemy sprite
-function slender (sw) {
-    
-    noFill();
-    ellipse(193, 179, 100, 100);
-    bezier(195, 229, 159+ sin(frameCount * 6) * 5, 269+ sin(frameCount * 6) * 5, 153+ sin(frameCount * 6) * 5, 282, 182+ sin(frameCount * 1) * 4, 356+ sin(frameCount * 5) * 2);
-    bezier(207, 228, 225+ sin(frameCount * 6) * 5, 269+ sin(frameCount * 6) * 5, 153+ sin(frameCount * 4) * 6, 282, 223+ sin(frameCount * 6) * 5, 356+ sin(frameCount * 3) * 19);
-    bezier(198, 230, 225+ sin(frameCount * 6) * 5, 332+ sin(frameCount * 6) * 5, 153+ sin(frameCount * 4) * 3, 244, 149+ sin(frameCount * 4) * 6, 356+ sin(frameCount * 7) * 10);
-    bezier(170, 224, 108+ sin(frameCount * 6) * 5, 325+ sin(frameCount * 6) * 5, 190+ sin(frameCount * 5) * 6, 242, 125+ sin(frameCount * 3) * 8, 356+ sin(frameCount * 3) * 8);
-    bezier(218, 224, 196+ sin(frameCount * 6) * 5, 338+ sin(frameCount * 6) * 5, 271+ sin(frameCount * 8) * 4, 297, 242+ sin(frameCount * 7) * 10, 356+ sin(frameCount * 4) * 6);
-    bezier(218, 223, 269+ sin(frameCount * 6) * 5, 361+ sin(frameCount * 6) * 5, 231+ sin(frameCount * 5) * 5, 339, 232+ sin(frameCount * 3) * 19, 356+ sin(frameCount * 6) * 5);
-    bezier(213, 225, 249+ sin(frameCount * 6) * 5, 354+ sin(frameCount * 6) * 5, 200+ sin(frameCount * 2) * 18, 273, 215+ sin(frameCount * 5) * 2, 356+ sin(frameCount * 1) * 4);
-    bezier(178, 227, 204, 301+ sin(frameCount * 6) * 5, 156, 258, 168+ sin(frameCount * 6) * 8, 356);
-    
-    line(225, 139, 250, 128);
-    line(162, 139, 134, 128);
-    line(243, 169, 250, 128);
-    line(144, 169, 134, 128);
-    
-    if(sw === "left")
-    {
-        push();
-        translate(-10, -10);
-        line(163, 200, 176, 180);
-        line(193, 200, 176, 180);
-        line(193, 200, 209, 180);
-        line(223, 200, 209, 180);
-        pop();
-    }
-    
-    if(sw === "right")
-    {
-        push();
-        translate(10, -10);
-        line(163, 200, 176, 180);
-        line(193, 200, 176, 180);
-        line(193, 200, 209, 180);
-        line(223, 200, 209, 180);
-        pop();
-    }
-}
-function slenderSprite (sw, x, y, s) {
-    push();
-    translate(x, y);
-    scale(s / 100);
-    stroke(0, 0, 0, 50);
-    strokeWeight(15);
-    slender(sw);
-    stroke(0);
-    strokeWeight(3);
-    slender(sw);
-    pop();
-}
-
-// slender class
-class Badplayer {
-    
-    constructor (x, y, leftBound, rightBound, switcher, speed) {
-        this.x = x;  this.y = y;
-        this.w = 30;  this.h = 60;
-        this.s = speed;  this.g = 1;
-        this.xorig = x; this.yorig = y;
-        this.leftBound = leftBound;  this.rightBound = rightBound;
-        this.switcher = switcher;
-    }
-    
-    draw () {
-        
-        // show collision box for spectator mode
-        if(spectMode)
-        {
-            stroke(255, 255, 255);
-            noFill();
-            rect(this.x, this.y, this.w, this.h);
-        }
-        
-        if(view(this))
-        {
-            fill(255);
-            slenderSprite(this.switcher, this.x - 39, this.y - 38, 28);
-        }
-    }
-    
-    update () {
-        
-        if(view(this))
-        {
-            // go from left and right
-            if(this.x <= this.leftBound) { this.switcher = "right"; }
-            if(this.x >= this.rightBound) { this.switcher = "left"; }
-            if(this.switcher === "left") { this.x -= this.s; }
-            if(this.switcher === "right") { this.x += this.s; }
-
-            // set gravity for slender
-            this.y += this.g;
-            this.g += 0.98;
-
-            // if players touched enemy reset map
-            if(rectCollide(this, levelMap[level].player))
-            {
-                squid.play();
-                reset();
-            }
-        }
-    }
-}
-
-// class for bezier collision
-class Curv {    
-    constructor (x1 ,y1 ,x2 , y2, c) {
-        
-        this.x1 = x1;  this.y1 = y1;
-        this.x2 = x2;  this.y2 = y2;
-        this.c = c;
-
-
-        this.x = 0;
-        this.y = 0;
-        this.w = 0;
-        this.h = 0;
-
-        // create a box around bezier curve for camera purposes
-        if(this.y1 <= this.y2)
-        {
-          this.x = this.x1 - 10;
-          this.y = this.y1 - abs(this.c);
-          this.w = this.x2 - this.x1 + 20;
-          this.h = (this.y2 - this.y1) + abs(this.c);
-        } else
-        {
-          this.x = this.x1 - 10;
-          this.y = this.y2 - abs(this.c);
-          this.w = this.x2 - this.x1 + 20;
-          this.h = (this.y1 - this.y2) + abs(this.c);
-        }
-    }
-  
-    draw (p, e) {
-      
-    stroke(255);  
-    strokeWeight(2);
-    
-    // show collision box for spectator mode
-    if(spectMode)
-    {
-        noFill();
-        rect(this.x, this.y, this.w, this.h);
-        for(var i = 0; i < this.x2 - this.x1; i += 2)
-        {
-            point(this.x1 + i, this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1));
-        }
-    }
-    
-    if(view(this))
-    {
-        
-        // collide with squid enemy
-        for(var j = 0; j < e.length; j++)
-        {
-            if(!rectCollide(e[j], this))
-            {
-                continue;
-            }
-            
-            var i = (e[j].x - this.x1);
-            
-            if(bezierCollisionPoint(i, e[j], this))
-            {
-                e[j].y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - e[j].h;
-
-                e[j].g = 1;
-            }
-
-        }
-        
-        // collide with player
-        if(rectCollide(p, this))
-        {
-            for(var i = (p.x - this.x1) + 5; i < (this.x2 - this.x1) + (p.x - this.x2 + 30); i += 5)
-            {   
-                if(bezierCollisionPoint(i, p, this) && (p.y + p.h) < (this.y + this.h + 20))
-                {
-                    p.y = this.y1 + (this.c*sin(pi*(i/((this.x2-this.x1)/57.4)))) + (this.y2 - this.y1)*i/(this.x2 - this.x1) - p.h;
-                    p.jump = false;
-                    p.g = 1;
-                }
-            }
-        }
-            
-    }
-  }
-}
-
-// appearing text in game
-class StoryTxt {
-    
-    constructor (m, tx, ty, s, r, x, y, w, h, seeBox) {
-        this.m = m;
-        this.tx = tx; this.ty = ty;
-        this.s = s; this.r = r;
-        this.x = x; this.y = y;
-        this.w = w; this.h = h;
-        this.seeBox = seeBox;
-        this.inView = false;
-        this.show = 300;
-    }
-    
-    draw () {
-        
-        // showcase
-        noStroke();
-        textFont("serif");
-        textSize(this.s);
-        fill(255, 255, 255, 30  - this.show);
-        push();
-        translate(this.tx, this.ty);
-        rotate(this.r);
-        text(this.m, 0, 0 - this.s / 12);
-        text(this.m, 0, 0 + this.s / 12);
-        text(this.m, 0 + this.s / 12, 0 + this.s / 12);
-        text(this.m, 0 - this.s / 12, 0 - this.s / 12);
-        fill(255, 255, 255, 300 - this.show);
-        text(this.m, 0, 0);
-        pop();
-        
-        // if collide in apear box make woosh sound and fade in text
-        if(rectCollide(this,levelMap[level].player) && !this.inView)
-        {
-            this.inView = true;
-            wind.play();
-        }
-        
-        // once in view show text
-        if(this.inView || this.seeBox)
-        {
-            this.show /= 1.1;
-        }
-        
-        // for spectating
-        if(this.seeBox)
-        {
-            fill(255);
-            rect(this.x, this.y, this.w, this.h);
-        }
-    }
-    
-}
-
-// checkpoint
-class Checkpoint {
-    constructor (x, y) {        
-        this.x = x; this.y = y;
-        this.w = 30; this.h = 100;
-        this.gotit = false;
-        this.shade = 300;
-    }
-    draw () {
-        
-        // show collision box for spectator mode
-        if(spectMode)
-        {
-            stroke(255, 255, 255);
-            noFill();
-            rect(this.x, this.y, this.w, this.h);
-        }
-        
-        if(view(this))
-        {
-            noFill();
-            strokeWeight(6);
-            stroke(255, 255, 255, 100);
-            ellipse(this.x + this.w / 2, this.y + this.w / 2 - 2, this.w, this.w);
-            line(this.x + this.w / 2, this.y + this.w, this.x + this.w / 2, this.y + this.h);
-            strokeWeight(2);
-            stroke(255);
-            ellipse(this.x + this.w / 2, this.y + this.w / 2 - 2, this.w, this.w);
-            line(this.x + this.w / 2, this.y + this.w, this.x + this.w / 2, this.y + this.h);
-
-            noStroke();
-            
-            // effect
-            if(this.gotit)
-            {
-                this.shade /= 1.01;
-                fill(255, 255, 255, 300 - this.shade)
-                ellipse(this.x + this.w / 2, this.y + this.w / 2 - 2, this.w, this.w);
-            }
-            
-            // if player touches portal
-            if(rectCollide(this, levelMap[level].player))
-            {
-                this.gotit = true;
-                levelMap[level].player.origx = this.x + this.w / 2 + 30;
-                levelMap[level].player.origy = this.y + this.h / 2 - 100;
-            }
-        }
-    }
-}
-
-// camera spanner boxes
-class CamBox {
-    
-    constructor (spanX, spanY, spanSize, x, y, w, h, see)
-    {
-        this.x = x; this.y = y;
-        this.w = w; this.h = h;
-        this.spanX = spanX; this.spanY = spanY;
-        this.spanSize = spanSize;
-    }
-    
-    draw ()
-    {
-        // show collision box for spectator mode
-        if(spectMode)
-        {
-            noFill();
-            fill(255, 255, 255, 50);
-            rect(this.x, this.y, this.w, this.h);
-        }
-        
-        // update live camera spanners if player touches box
-        if(rectCollide(this, levelMap[level].player))
-        {
-            spanLiveX = this.spanY;
-            spanLiveSize = this.spanSize;
-            spanLiveX = this.spanX;
-        }
-    }
-}
-
-// sprite for anastasia
-function ana (stage) {
-
-    if(stage === "stag")
-    {
-        ellipse(200, 111, 40, 50);
-        beginShape();
-        vertex(193, 135);
-        vertex(207, 135);
-        vertex(210 + 10, 242);
-        vertex(190 - 10, 242);
-        vertex(193, 135);
-        endShape();
-    }
-
-    if(stage === "stag")
-    {
-        bezier(201, 86, 217, 87, 169, 88, 163, 129 + sin(frameCount * 2) * 4);
-        bezier(201, 86, 217, 87, 169, 88, 176, 129 + sin(frameCount * 3) * 4);
-        bezier(201, 86, 217, 87, 169, 88, 176, 93 + sin(frameCount * 2) * 9);
-        bezier(201, 86, 217, 87, 169, 71, 150, 100 + sin(frameCount * 2) * 4);
-        bezier(201, 86, 217, 87, 169, 71, 150, 125 + sin(frameCount * 1) * 7);
-        push();
-        translate(400, 0);
-        scale(-1.00, 1.00);
-        bezier(201, 86, 217, 87, 169, 88, 163, 129 + sin(frameCount * 2) * 4);
-        bezier(201, 86, 217, 87, 169, 88, 176, 129 + sin(frameCount * 3) * 4);
-        bezier(201, 86, 217, 87, 169, 88, 176, 93 + sin(frameCount * 2) * 9);
-        bezier(201, 86, 217, 87, 169, 71, 150, 100 + sin(frameCount * 2) * 4);
-        bezier(201, 86, 217, 87, 169, 71, 150, 125 + sin(frameCount * 1) * 7);
-        pop();
-    }
-
-    if(stage === "move" && levelMap[level].player.jump === false)
-    {
-        push();
-        translate(197, 160);
-        rotate(sin(frameCount * 8) * 30);
-        line(0, 0, -19, 23);
-        line(0 -sin(frameCount * 8) * 10, 39 +sin(frameCount * 1) * 5, -18, 23);
-        pop();
-
-        push();
-        translate(216, 160);
-        rotate(-77-sin(frameCount * 8) * 30);
-        line(0, 0, -19, 23);
-        line(-9 +sin(frameCount * 8) * 10, 39 -sin(frameCount * 1) * 5, -18, 23);
-        pop();
-
-        push();
-        translate(190, 243);
-        rotate(-25+ sin(frameCount * 8) * 35);
-        line(0, 0, 0, 20);
-
-        line(-11 - sin(frameCount * 8) * 12, 45, 0, 20);
-        pop();
-
-        push();
-        translate(210, 243);
-        rotate(5 - sin(frameCount * 8) * 35);
-        line(0, 0, 0, 20);
-        line(-11 + sin(frameCount * 8) * 12, 45, 0, 20);
-        pop();
-    }
-
-    if(stage === "move")
-    {
-        push();
-        translate(10,0);
-        bezier(201, 86, 217, 87, 169, 88, 163, 129 + sin(frameCount * 2) * 4);
-        bezier(201, 86, 217, 87, 169, 88, 176, 129 + sin(frameCount * 3) * 4);
-        bezier(201, 86, 217, 87, 169, 88, 176, 93 + sin(frameCount * 2) * 9);
-        bezier(201, 86, 217, 87, 169, 71, 150, 100 + sin(frameCount * 2) * 4);
-        bezier(201, 86, 217, 87, 169, 71, 150, 125 + sin(frameCount * 1) * 7);
-        pop();
-
-        ellipse(200 + 10, 111, 40, 50);
-        beginShape();
-        vertex(193 + 10, 135);
-        vertex(207 + 10, 135);
-        vertex(210 + 10, 242);
-        vertex(190 - 10, 242);
-        vertex(193 + 8, 135);
-        endShape();
-    }
-
-    if(stage === "stag" && levelMap[level].player.jump === false)
-    {
-        line(189, 160 + sin(frameCount * 2) * 4, 172, 183);
-        line(189, 199 + sin(frameCount * 2) * 4, 172, 183);
-        line(210, 160 + sin(frameCount * 2) * 4, 228, 183);
-        line(210, 199 + sin(frameCount * 2) * 4, 228, 183);
-    }
-
-    if(stage === "stag" || levelMap[level].player.jump === true)
-    {
-
-        line(190, 243, 190, 243 + 40);
-        line(210, 243, 210, 243 + 40);
-    }
-
-    if(levelMap[level].player.jump === true && stage === "stag")
-    {
-        line(189, 160, 172, 183 - 50);
-        line(210, 160, 228, 183 - 50);
-    }
-
-    if(levelMap[level].player.jump === true && stage === "move")
-    {
-        line(189 + 5, 160, 172 + 5, 183 - 50);
-        line(210 + 8, 160, 228 + 8, 183 - 50);
-    }    
-};
-function anaSprite(x, y, s){
-    
-    push();
-    translate(x, y);
-    scale(s / 100);
-    
-    
-    // right
-    if((keys[39] || keys[68]))
-    {
-        noFill();
-        strokeWeight(15);
-        stroke(255, 255, 255, 50);
-        ana("move");
-        strokeWeight(3);
-        stroke(255);
-        ana("move");
-    }
-    
-    // left
-    else if((keys[37] || keys[65]))
-    {
-        push();
-        translate(400, 0);
-        scale(-1.00, 1.00);
-        noFill();
-        strokeWeight(15);
-        stroke(255, 255, 255, 50);
-        ana("move");
-        strokeWeight(3);
-        stroke(255);
-        ana("move");
-        pop();
-    }
-    
-    else
-    {
-        push();
-        translate(400, 0);
-        scale(-1.00, 1.00);
-        noFill();
-        strokeWeight(15);
-        stroke(255, 255, 255, 50);
-        ana("stag");
-        strokeWeight(3);
-        stroke(255);
-        ana("stag");
-        pop();
-    }
-    
-    pop();
-};
-
-// class for main player
-class Player {
-  
-  constructor (x, y, w, h)
-  {
-    this.x = x;  this.y = y;
-    this.origy = y;  this.origx = x;
-    this.w = w;  this.h = h;
-    this.s = 5;   this.g = 1;
-    this.CanX = 0; this.CanY = 0;
-    this.jump = false;
-    cam = new Camera(this.x,this.y);
-  }
-  update () {
-      
-        if(spectMode)
-        {
-            stroke(255, 255, 255);
-            noFill();
-            rect(this.x, this.y, this.w, this.h);
-        }
-        
-        // move with keys
-        if((keys[37] || keys[65])) { this.x -= this.s; }
-        if((keys[39] || keys[68])) { this.x += this.s; }
-
-        // jump with keys
-        if((keys[38] || keys[32] || keys[87]) && !this.jump && this.g <= 5) {
-            this.jump = true;
-            this.g = -10;
-            jumpS.play();
-        }
-        
-        // walk sound
-        if((keys[37] || keys[65] || keys[39] || keys[68]) && this.jump === false && this.g <= 5)
-        {
-            walk.play();
-            walk.volume = 0.05;
-        } else
-        {
-            walk.volume = 0;
-            walk.currentTime = 0;
-        }
-      
-        // gravity
-        this.y += this.g;
-        // this.g += 0.55;
-        this.g += 0.35;
-
-        if(this.y >= levelMap[level].CanvasH)
-        {
-            reset();
-        }
-
-        if(this.x <= 0)
-        {
-            this.x = 0; 
-        }
-
-        if(this.x >= levelMap[level].Canvas - this.w)
-        {
-            this.x = levelMap[level].Canvas - this.w;
-        }
-    }
-    draw () {
-        // draw player
-        push();
-        translate(this.x, this.y);
-        anaSprite(-85, -40, 50);
-        pop();
-    }
-}
-
-// shadow floater
-class Floater
-{
-  constructor(x,y,s,r)
-  {
-    this.originX = x;
-    this.originY = y;
-    this.x = x  - s /4;
-    this.y = y  - s /2;
-    this.s = s;
-    this.w = this.s;
-    this.h = this.s;
-    this.f = 0;
-    this.r = r;
-    this.block();
-  }
-
-  image()
-  {
-    noFill();
-    quad(200, 100, 175, 150, 200, 200, 224, 150);
-    
-    triangle(217, 136, 225, 108, 209, 118);
-    triangle(232 -50, 136, 225 - 50, 108, 241 - 50, 118);
-    
-    var rotSpeed = 0.5;
-    var triDist = 60;
-    
-    noFill();
-    
-    for(var i = 0; i < 12; i ++)
-    {
-      triangle(195 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 155  - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)), 205 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 155 - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)), 200 - ((67 + (10*sin(3 *frameCount))) *cos((frameCount + (triDist * i)) * rotSpeed)), 146 - ((67 + (10*sin(3 *frameCount))) *sin((frameCount + (triDist * i)) * rotSpeed)));   
-    }
-
-    arc(192, 150, 10, 10, 264, 458);
-    arc(192, 155, 10, 10, 429, 632);
-    
-    arc(207, 155, 10, 10, 264, 458);
-    arc(207, 150, 10, 10, 429, 632);
-  }
-
-  draw()
-  {
-    noFill();
-    
-    var size;
-    noStroke();
-    fill(0, 0, 0, 150);
-    for(var i = 0; i < this.r * 2; i++)
-    {
-      size = 2 + 3* sin((i / 90) * frameCount);
-      ellipse(this.originX + ((this.r - 30 + size/2)*sin(2 * i)), this.originY+ ((this.r - 30 + size /2)*cos(2 * i)), size, size);  
-    }
-    
-    if(view(this) - 100)
-    {
-        push();
-        translate(this.x, this.y);
-        translate(this.s * -1.74, this.s * -0.99);
-        scale(this.s / 100);
-        strokeWeight(7);
-        stroke(0, 0, 0, 60);
-        this.image();
-        strokeWeight(2);
-        stroke(0, 0, 0);
-        this.image();
-        pop();
-    }
-  }
-
-  movement()
-  {
-    var seekX;
-    var seekY;
-    var d;
-    
-    if(dist(levelMap[level].player.x + levelMap[level].player.w/2, levelMap[level].player.y + levelMap[level].player.h/2, this.originX , this.originY) <= this.r)
-    {
-      seekX = levelMap[level].player.x + levelMap[level].player.w/2;
-      seekY = levelMap[level].player.y + levelMap[level].player.h/2;
-    }
-    else
-    {
-      seekX = this.originX;
-      seekY = this.originY;
-    }
-    
-    var e = new createVector(this.x  + this.s /4, this.y  + this.s/2);
-    var p = new createVector(seekX, seekY);
-    
-    p.sub(e);
-    
-    d = dist(seekX, seekY, this.x, this.y);
-    
-    this.x += ( 2 *(p.x) / 200);
-    this.y += ( 2 *(p.y) / 200);
-  }
-
-  block()
-  {
-    this.meshX = [];
-    this.meshY = [];
-    this.meshW = [];
-    this.meshH = [];
-    
-    for(var i = 0; i < 12; i++)
-    {
-      this.meshX.push(this.x);
-      this.meshY.push(this.y);
-      this.meshW.push(this.s/6.5);
-      this.meshH.push(this.s/6.5);
-    }
-  }
-
-  mesh()
-  {
-    for(var i = 0; i < 12; i++)
-    {
-        this.meshX[i] = this.x + this.s / 4 - (this.s / 6.5)/2 - (this.s/1.52 + (this.s / 10) *sin(frameCount * 3)) *sin(0.5*frameCount + (i*30));    
-        this.meshY[i] = this.y + this.s/2  - (this.s / 6.5)/2 + (this.s/1.52 + (this.s / 10) * sin(frameCount * 3)) *cos(0.5*frameCount  + (i*30));
-        
-        if(spectMode)
-        {
-            stroke(255, 255, 255);
-            noFill();
-            rect(this.meshX[i], this.meshY[i], this.meshW[i], this.meshH[i]);
-        }
-    }
-  }
-
-  collision()
-  {
-    this.mesh();
-    
-    for(var i = 0; i < 12; i++)
-    {
-      if(levelMap[level].player.x + levelMap[level].player.w > this.meshX[i] && levelMap[level].player.x < this.meshX[i] + this.meshW[i] && levelMap[level].player.y + levelMap[level].player.h > this.meshY[i] && levelMap[level].player.y < this.meshY[i] + this.meshH[i])
-      {
-        reset();
-      }
-    }
-  }
-
-  apply()
-  {
-    this.collision();
-    this.draw();
-    this.movement();
-  }
-}
-
-// snow effect
-function snow (w){
-    
-    push();
-    noStroke();
-    
-    //particles
-    for(var i = 0; i < particles.x.length; ++i)
-    {
-        //fill
-        fill(255, 255, 255, 200);
-        ellipse(particles.x[i], particles.y[i], particles.s[i], particles.s[i]); // circle for particle
-        
-        //particles.s[i] -= 0.4; // size decreases
-        particles.y[i] += particles.s[i]; // particl goes up
-        particles.x[i] -= 0.5;
-        
-        if(particles.y[i] >= levelMap[level].CanvasH) // is particle is totally shrunk
-        {
-            //reset particle
-            particles.x[i] = random(0, w);
-            particles.y[i] = -10;
-            particles.s[i] = random(1, 3);
-        }
-    }
-    
-    //appear
-    if(particles.x.length <= 150)
-    {
-        particles.x.push(random(0, w));
-        particles.y.push(random(-600, -10));
-        particles.s.push(random(1, 3));
-        particles.r.push(random(0, 360));
-    }
-    pop();
-};
-
-// draw all elements
-function drawLevels () {
-    
-    portalAccess = true;
-
-    push();
-    translate(scoutMap[0], scoutMap[1]);
-    cam.view(levelMap[level].player);
-
-    // level bg's
-    switch (level) {
-            case 0:
-        image(bg1, 0, 0);
-        snow(levelMap[level].Canvas + 100);
-        image(scene1_rocks, 0, 0);
-                break;
-            
-        case 1:
-        image(bg3, 0, 0);
-        snow(levelMap[level].Canvas + 100);
-        image(scene3_rocks, 0, 0);
-                break;
-        
-        case 2:
-        image(bg4, 0, 0);
-        snow(levelMap[level].Canvas + 100);
-        image(scene4_rocks, 0, 0);
-                break;
-            
-        case 3:
-        image(bg2, 0, 0);
-        snow(levelMap[level].Canvas + 100);
-        image(scene2_rocks, 0, 0);
-                break;
-    }
-    
-    /** DRAW ALL MAP ELEMENTS**/
-    
-    for(var i = 0; i < levelMap[level].curves.length; i++)
-    {
-      levelMap[level].curves[i].draw(levelMap[level].player, levelMap[level].badplayer);
-    }
-    
-    for(var i = 0; i < levelMap[level].hope.length; i++) {
-      levelMap[level].hope[i].draw();
-        if(levelMap[level].hope[i].collected === false) { 
-            portalAccess = false;
-        }
-    }
-    
-    for(var i = 0; i < levelMap[level].storytxt.length; i++) {
-      levelMap[level].storytxt[i].draw();
-    }
-    
-    for(var i = 0; i < levelMap[level].checkpoints.length; i++) {
-      levelMap[level].checkpoints[i].draw();
-    }
-    
-    for(var i = 0; i < levelMap[level].badplayer.length; i++) {
-        levelMap[level].badplayer[i].draw();
-        levelMap[level].badplayer[i].update();
-    }
-    
-    for(var i = 0; i < levelMap[level].floaters.length; i++)
-    {
-      levelMap[level].floaters[i].apply();
-    }
-    
-    for(var i = 0; i < levelMap[level].camboxes.length; i++)
-    {
-      levelMap[level].camboxes[i].draw();
-    }
-    
-    levelMap[level].portal.draw();
-    levelMap[level].player.draw();
-    levelMap[level].player.update();
-    
-    
-    /** LIVE CAMERA SPANNING DETECTION **/
-    
-    if(levelMap[level].spanSize <= spanLiveSize)
-    {
-        levelMap[level].spanSize += 0.2;
-    }
-    if(levelMap[level].spanSize >= spanLiveSize)
-    {
-        levelMap[level].spanSize -= 0.2;
-    }
-    if(levelMap[level].spanSize === spanLiveSize)
-    {
-        levelMap[level].spanSize = spanLiveSize;
-    }
-
-    if(levelMap[level].spanX <= spanLiveX)
-    {
-        levelMap[level].spanX += 2;
-    }
-    if(levelMap[level].spanX >= spanLiveX)
-    {
-        levelMap[level].spanX -= 2;
-    }
-    if(levelMap[level].spanX === spanLiveX)
-    {
-        levelMap[level].spanX = spanLiveX;
-    }
-    
-    if(levelMap[level].spanY <= spanLiveY)
-    {
-        levelMap[level].spanY += 2;
-    }
-    if(levelMap[level].spanY >= spanLiveY)
-    {
-        levelMap[level].spanY -= 2;
-    }
-    if(levelMap[level].spanY === spanLiveY)
-    {
-        levelMap[level].spanY = spanLiveY;
-    }
-    
-    pop();
+    levelMap[level].player.g = -10;
 };
 
 var startMusicDelay = 0;
-
 var h = window.innerHeight;
 
-function draw() {
+new p5(function (p5){
     
-    createCanvas(window.innerWidth, window.innerHeight);
+    p5.keyPressed = function () {
+        keys[p5.keyCode] = true;
+    };
+    p5.keyReleased = function (){
+        keys[p5.keyCode] = false;
+    };
     
-    // if in levels
-    startMusicDelay ++;
-    if(startMusicDelay >= 100)
-    {
-        bgMusic.play();
-        startMusicDelay = 100;
+    p5.preload = function () {
+        
+        // load game sounds
+        doveS = new Audio('sounds/whistle.mp3');
+        bgMusic = new Audio('sounds/desolation.wav');
+        walk = new Audio("sounds/walk.mp3");
+        jumpS = new Audio("sounds/jump.mp3");
+        portalS = new Audio("sounds/portal.mp3");
+        wind = new Audio("sounds/wind.mp3");
+        squid = new Audio("sounds/squid.mp3");
+
+        populateMaps(p5);
+
+        // fine tune volume and reverb settings
+        doveS.volume = 0.05;
+        doveS.reverb = 1;
+        jumpS.volume = 0.25;
+        portalS.volume = 0.05;
+        wind.volume = 1;
+        squid.volume = 0.2;
     }
     
-    textAlign(CENTER, CENTER);
-    background(0);
-    drawLevels();
+    p5.setup = function () {
+        p5.createCanvas(window.innerWidth, window.innerHeight);
+        p5.angleMode(p5.RADIANS);
+        p5.frameRate(60);
+    }
     
-    trans /= 1.1;
-    fill(255, 255, 255, trans);
-    rect(0, 0, window.innerWidth, window.innerHeight);    
-}
+    p5.draw = function () {
+        
+        p5.createCanvas(window.innerWidth, window.innerHeight);
+
+        // if in levels
+         startMusicDelay ++;
+         if(startMusicDelay >= 100)
+         {
+             bgMusic.play();
+             startMusicDelay = 100;
+         }
+
+        p5.textAlign(p5.CENTER, p5.CENTER);
+        p5.background(0);
+        drawLevels(p5);
+
+        spectateModeAssets(p5);
+
+        trans /= 1.1;
+        p5.fill(255, 255, 255, trans);
+        p5.rect(0, 0, window.innerWidth, window.innerHeight);
+    }
+    
+});
